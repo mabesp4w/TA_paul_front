@@ -1,0 +1,40 @@
+/** @format */
+"use client";
+import InputText from "@/components/input/InputText";
+import { FC } from "react";
+
+type Props = {
+  register: any;
+  errors: any;
+  control: any;
+  watch: any;
+  setValue: any;
+};
+
+const FormLogin: FC<Props> = ({ register, errors }) => {
+  return (
+    <div className="flex flex-col gap-y-2">
+      <InputText
+        label="Email"
+        name="email"
+        register={register}
+        required
+        minLength={2}
+        errors={errors.email}
+        addClass="col-span-4"
+        type="email"
+      />
+      <InputText
+        label="Password"
+        name="password"
+        register={register}
+        required
+        minLength={3}
+        errors={errors.password}
+        type="password"
+      />
+    </div>
+  );
+};
+
+export default FormLogin;
