@@ -2,7 +2,7 @@
 
 "use client";
 import React from "react";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import BookCard from "@/components/card/BookCard";
 import StatCard from "@/components/card/StatCard";
 import ReadingHistoryTable from "@/components/table/ReadingHistoryTable";
@@ -144,15 +144,10 @@ const Content = () => {
             </div>
             <input
               type="text"
-              className="input input-bordered pl-10 w-full md:w-64"
+              className="input input-bordered pl-10 w-full md:w-64 mr-12 lg:mr-0"
               placeholder="Cari buku, penulis, kategori..."
             />
           </div>
-
-          <button className="btn btn-primary">
-            <Plus size={18} />
-            Tambah Koleksi
-          </button>
         </div>
       </div>
 

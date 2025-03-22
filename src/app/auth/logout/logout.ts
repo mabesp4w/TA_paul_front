@@ -16,9 +16,9 @@ type LogoutResponse = {
 type Props = {
   setLogout: () => Promise<LogoutResponse>;
   setLoadLogout: React.Dispatch<React.SetStateAction<boolean>>;
-  route: any;
+  router: any;
 };
-const handleLogout = async ({ setLogout, setLoadLogout, route }: Props) => {
+const handleLogout = async ({ setLogout, setLoadLogout, router }: Props) => {
   setLoadLogout(true);
   const res = await setLogout();
   if (res?.status === "success") {
@@ -26,8 +26,8 @@ const handleLogout = async ({ setLogout, setLoadLogout, route }: Props) => {
     Cookies.remove("token");
     Cookies.remove("role");
     Cookies.remove("user");
-    return route.push("/auth/login");
-    console.log({ route });
+    return router.push("/auth/login");
+    console.log({ router });
   }
 };
 

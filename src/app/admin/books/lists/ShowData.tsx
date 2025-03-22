@@ -82,7 +82,7 @@ const ShowData: FC<Props> = ({ setDelete, setEdit }) => {
   }
 
   const onClick = (row: BookType) => {
-    router.push(`/books/files/${row.id}`);
+    router.push(`/admin/books/files/${row.id}`);
   };
 
   return (

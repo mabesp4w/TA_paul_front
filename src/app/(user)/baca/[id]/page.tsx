@@ -194,7 +194,7 @@ export default function Reader({ params }: { params: { id: string } }) {
 
       <div className="flex flex-col h-screen">
         {/* Reader Header */}
-        <header className="navbar bg-base-100 shadow-sm z-10">
+        <header className="navbar bg-base-100 shadow-sm z-10 pr-16 lg:mr-0">
           <div className="flex-1">
             <Link href="/" className="btn btn-ghost btn-sm gap-1">
               <ArrowLeft size={18} />

@@ -19,6 +19,7 @@ const Auth = () => {
       // redirect to login
       router.push("/auth/login");
     }
+
     return res;
   };
 

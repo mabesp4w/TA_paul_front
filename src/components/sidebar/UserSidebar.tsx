@@ -1,7 +1,7 @@
 /** @format */
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BookOpen,
   Home,
@@ -15,12 +15,33 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import useLogout from "@/stores/auth/logout";
+import handleLogout from "@/app/auth/logout/logout";
+import useUserApi from "@/stores/api/User";
+import Cookies from "js-cookie";
+
+const { id } = JSON.parse(Cookies.get("user") || "{}");
+const token = Cookies.get("token");
 
 const UserSidebar = () => {
   const pathname = usePathname();
   // state
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [loadLogout, setLoadLogout] = useState(false);
+  // store
+  const { setLogout } = useLogout();
+  const { setShowUser, showUser } = useUserApi();
+  // router
+  const router = useRouter();
+  // useEffect
+  useEffect(() => {
+    if (id && token) {
+      setShowUser(id);
+    }
+  }, [id, token]);
+
+  console.log({ showUser });
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -30,11 +51,13 @@ const UserSidebar = () => {
     return pathname === href;
   };
 
-  const signOut = () => {};
+  const signOut = () => {
+    handleLogout({ setLogout, setLoadLogout, router });
+  };
   return (
     <>
       {/* Tombol hamburger yang hanya muncul di layar kecil */}
-      <div className="lg:hidden fixed top-4 left-4 z-30">
+      <div className="lg:hidden fixed top-6 right-4 z-30">
         <button
           onClick={toggleDrawer}
           className="btn btn-circle btn-primary"
@@ -65,10 +88,10 @@ const UserSidebar = () => {
             {/* Logo and App title */}
             <div className="px-6 py-4 border-b border-base-300">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary text-primary-content flex items-center justify-center rounded-lg text-xl font-bold">
-                  B
+                <div className="h-10 bg-primary text-primary-content flex items-center justify-center rounded-lg text-xl font-bold px-2">
+                  WWF
                 </div>
-                <span className="text-xl font-bold">BookShelf</span>
+                <span className="text-xl font-bold">Ruang Baca</span>
               </div>
             </div>
 
@@ -177,15 +200,20 @@ const UserSidebar = () => {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      onClick={() => {
-                        setIsDrawerOpen(false);
-                        signOut();
-                      }}
-                      className="text-error"
-                    >
-                      <LogOut size={18} /> Keluar
-                    </a>
+                    {loadLogout ? (
+                      <span className="loading loading-spinner"></span>
+                    ) : (
+                      <Link
+                        href={"#"}
+                        onClick={() => {
+                          setIsDrawerOpen(false);
+                          signOut();
+                        }}
+                        className="text-error"
+                      >
+                        <LogOut size={18} /> Keluar
+                      </Link>
+                    )}
                   </li>
                 </ul>
               </div>
@@ -194,21 +222,12 @@ const UserSidebar = () => {
             {/* User Profile */}
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-base-300">
               <div className="flex items-center gap-3">
-                <div className="avatar">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                    {/* {session?.user?.image ? (
-                      <Image src={session.user.image} alt={session.user.name} />
-                    ) : (
-                      getInitials(session?.user?.name)
-                    )} */}
-                  </div>
-                </div>
                 <div className="flex-1 overflow-hidden">
                   <p className="font-medium truncate">
-                    {/* {session?.user?.name || "Pengguna"} */}
+                    {showUser?.first_name || "Pengguna"}
                   </p>
                   <p className="text-xs opacity-60 truncate">
-                    {/* {session?.user?.email || "user@example.com"} */}
+                    {showUser?.email || "user@example.com"}
                   </p>
                 </div>
               </div>

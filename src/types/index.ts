@@ -5,11 +5,11 @@
 // User Types
 export interface User {
   id: string;
-  name: string;
+  first_name: string;
   email: string;
-  bio?: string;
-  image?: string;
-  joinedAt: string;
+  last_login?: string;
+  username: string;
+  show_password: string;
 }
 
 // Book Types

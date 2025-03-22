@@ -12,7 +12,7 @@ import { useWelcomeContext } from "@/context/WelcomeContext";
 import DeleteModal from "@/components/modal/DeleteModal";
 import useBook from "@/stores/crud/Book";
 
-const halaman = "Foto";
+const halaman = "Buku";
 
 // type setDelete
 type Delete = {

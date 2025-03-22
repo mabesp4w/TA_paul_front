@@ -101,7 +101,7 @@ const BookmarkPage = () => {
   return (
     <div className="p-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 mr-12 lg:mr-0">
         <h1 className="text-2xl font-bold">Bookmark Saya</h1>
 
         <div className="flex gap-3">

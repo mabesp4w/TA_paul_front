@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { SubmitHandler, useForm } from "react-hook-form";
 import FormLogin from "./FormLogin";
+import Link from "next/link";
 
 type Inputs = {
   email: string;
@@ -68,10 +69,14 @@ const Login = () => {
       setError(res?.error?.message);
     } else {
       const { data } = res;
-      Cookies.set("token", data.access_token);
-      Cookies.set("role", data.user.role);
-      Cookies.set("user", JSON.stringify(data.user));
-      return router.push("/dashboard");
+      Cookies.set("token", data.access_token, { expires: 7 });
+      Cookies.set("role", data.user.role, { expires: 7 });
+      Cookies.set("user", JSON.stringify(data.user), { expires: 7 });
+      if (data.user.role === "admin") {
+        return router.push("/admin/dashboard");
+      } else {
+        return router.push("/dashboard");
+      }
     }
 
     if (res) {
@@ -122,9 +127,9 @@ const Login = () => {
             <div className="text-center mt-4">
               <p>
                 Belum punya akun?{" "}
-                <a href="/register" className="text-primary">
+                <Link href="/auth/register" className="text-primary">
                   Daftar
-                </a>
+                </Link>
               </p>
             </div>
           </form>

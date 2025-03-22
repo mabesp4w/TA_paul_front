@@ -4,6 +4,7 @@
 import { useMenuContext } from "@/context/MenuContext";
 import React, { FC, ReactNode, useEffect, useRef } from "react";
 import Sidebar from "../sidebar/Sidebar";
+import { usePathname } from "next/navigation";
 
 type DrawerProps = {
   children: ReactNode;
@@ -13,6 +14,8 @@ const Drawer: FC<DrawerProps> = ({ children }) => {
   const { isOpen, setIsOpen } = useMenuContext();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLLabelElement>(null);
+  // pathname
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,8 +36,13 @@ const Drawer: FC<DrawerProps> = ({ children }) => {
     };
   }, [isOpen, setIsOpen]);
 
+  // close if pathname change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname, setIsOpen]);
+
   return (
-    <div className="drawer">
+    <div className="drawer z-50">
       <input
         id="my-drawer"
         type="checkbox"

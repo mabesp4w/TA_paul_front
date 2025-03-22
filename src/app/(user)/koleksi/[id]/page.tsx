@@ -156,7 +156,7 @@ const CollectionDetail = ({ params }: { params: { id: string } }) => {
   return (
     <div className="p-6">
       {/* Page Header */}
-      <div className="flex flex-wrap items-center gap-3 mb-2">
+      <div className="flex flex-wrap items-center gap-3 mb-2 mr-12 lg:mr-0">
         <Link href="/koleksi" className="btn btn-ghost btn-sm gap-1">
           <ChevronLeft size={16} />
           Koleksi

@@ -121,7 +121,7 @@ const KategoriPage: NextPage = () => {
   return (
     <div className="p-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 mr-12 lg:mr-0">
         <h1 className="text-2xl font-bold">Kategori</h1>
 
         <div className="flex gap-3">

@@ -93,7 +93,7 @@ const getProperty = (obj: any, prop: any, index: number, setIndexBox: any) => {
           />
         ) : ["epub"].includes(extension) ? (
           <Link
-            href={`/books/views?file_nm=${file_nm}`}
+            href={`/admin/books/views?file_nm=${file_nm}`}
             target="_blank"
             rel="noreferrer"
             className="text-blue-700"

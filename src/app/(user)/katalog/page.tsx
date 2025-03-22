@@ -145,7 +145,7 @@ const Katalog = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h1 className="text-2xl font-bold">Katalog Buku</h1>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 mr-12 lg:mr-0">
           {/* Search */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

@@ -57,8 +57,6 @@ const ShowData: FC<Props> = ({ setDelete, setEdit, book_id }) => {
   const headTable = ["No", "Tipe File", "File", "Asli", "Aksi"];
   const tableBodies = ["file_type", "file_book", "is_original"];
 
-  console.log({ dtBookFile });
-
   if (isLoading) {
     return (
       <div className="h-full flex justify-center items-center">

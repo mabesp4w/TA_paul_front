@@ -29,10 +29,19 @@ const FormRegister: FC<Props> = ({ register, errors }) => {
   return (
     <>
       <div className="form-control">
-        <label className="label">
-          <span className="label-text">Nama</span>
-        </label>
         <InputText
+          label="Username"
+          name="username"
+          type="text"
+          placeholder="Masukkan username"
+          register={register}
+          required
+          errors={errors}
+        />
+      </div>
+      <div className="form-control">
+        <InputText
+          label="Nama Lengkap"
           name="name"
           type="text"
           placeholder="Masukkan nama lengkap"
@@ -43,10 +52,8 @@ const FormRegister: FC<Props> = ({ register, errors }) => {
       </div>
 
       <div className="form-control">
-        <label className="label">
-          <span className="label-text">Email</span>
-        </label>
         <InputText
+          label="Email"
           name="email"
           type="email"
           placeholder="Masukkan email anda"
@@ -57,10 +64,8 @@ const FormRegister: FC<Props> = ({ register, errors }) => {
       </div>
 
       <div className="form-control">
-        <label className="label">
-          <span className="label-text">Password</span>
-        </label>
         <InputText
+          label="Password"
           name="password"
           type="password"
           placeholder="Masukkan password"
@@ -72,11 +77,9 @@ const FormRegister: FC<Props> = ({ register, errors }) => {
       </div>
 
       <div className="form-control">
-        <label className="label">
-          <span className="label-text">Konfirmasi Password</span>
-        </label>
         <InputText
-          name="confirmPassword"
+          label="Konfirmasi Password"
+          name="password_confirm"
           type="password"
           placeholder="Konfirmasi password anda"
           register={register}

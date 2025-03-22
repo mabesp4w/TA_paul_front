@@ -21,7 +21,7 @@ const Sidebar = () => {
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const route = useRouter();
+  const router = useRouter();
 
   const isActiveLink = (href: string, params?: string) => {
     if (!href) return false;
@@ -107,7 +107,7 @@ const Sidebar = () => {
       ) : (
         <button
           className="btn btn-primary"
-          onClick={() => handleLogout({ setLogout, setLoadLogout, route })}
+          onClick={() => handleLogout({ setLogout, setLoadLogout, router })}
         >
           Logout
         </button>
