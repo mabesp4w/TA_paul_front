@@ -1,381 +1,302 @@
 /** @format */
+
+// src/app/anotasi/page.tsx
 "use client";
-// pages/anotasi.js
+
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Search,
-  Filter,
-  Highlighter,
-  ChevronRight,
-  Edit2,
-  Trash2,
-} from "lucide-react";
+import { Search, Highlighter, BookOpen, Trash2, Edit } from "lucide-react";
+import UserSidebar from "@/components/sidebar/UserSidebar";
 
-export default function AnotasiPage() {
-  const [showFilters, setShowFilters] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedAnnotation, setSelectedAnnotation] = useState(null);
-  const [noteText, setNoteText] = useState("");
+// Contoh data anotasi
+const userAnnotations = [
+  {
+    id: "1",
+    bookId: "1",
+    title: "Filosofi Teras",
+    author: "Henry Manampiring",
+    coverImage: "/images/filosofi-teras.jpg",
+    text: "Dikotomi kendali adalah konsep penting dalam filosofi Stoa yang mengajarkan kita untuk fokus pada hal-hal yang dapat kita kendalikan dan menerima hal-hal yang di luar kendali kita.",
+    note: "Ini konsep yang bisa saya terapkan untuk mengurangi kecemasan.",
+    color: "yellow",
+    location: "epubcfi(/6/12!/4/2/4/2[pgepubid00035]/1:0)",
+    created_at: "2025-03-20T10:15:00",
+    file_type: "epub",
+  },
+  {
+    id: "2",
+    bookId: "2",
+    title: "Atomic Habits",
+    author: "James Clear",
+    coverImage: "/images/atomic-habits.jpg",
+    text: "You do not rise to the level of your goals. You fall to the level of your systems.",
+    note: "Sistem lebih penting daripada tujuan. Fokus pada proses!",
+    color: "green",
+    location: "epubcfi(/6/14!/4/2/10/2[ch04]/1:0)",
+    created_at: "2025-03-18T16:30:00",
+    file_type: "epub",
+  },
+  {
+    id: "3",
+    bookId: "7",
+    title: "Thinking, Fast and Slow",
+    author: "Daniel Kahneman",
+    coverImage: "/images/thinking.jpg",
+    text: "System 1 is fast, instinctive and emotional; System 2 is slower, more deliberative, and more logical.",
+    note: "",
+    color: "blue",
+    location: "page=42",
+    created_at: "2025-03-15T19:45:00",
+    file_type: "pdf",
+  },
+];
 
-  // Sample annotations data
-  const annotations = [
-    {
-      id: 1,
-      text: "Pada hari pertama di sekolah, pagi itu, kami duduk di bangku panjang di depan kelas seperti deretan bebek yang berjalan ke sungai.",
-      note: "Metafora yang sangat menarik tentang anak-anak di hari pertama sekolah.",
-      color: "yellow",
-      book: {
-        id: 1,
-        title: "Laskar Pelangi",
-        author: "Andrea Hirata",
-        cover: "/covers/laskar-pelangi.jpg",
-      },
-      location: "Halaman 5",
-      addedAt: "2 hari yang lalu",
-    },
-    {
-      id: 2,
-      text: "Ilmu adalah seberkas cahaya di kegelapan gulita, yang menerangi jalan raya peradaban manusia.",
-      note: "Pernyataan kuat tentang pentingnya pendidikan.",
-      color: "blue",
-      book: {
-        id: 1,
-        title: "Laskar Pelangi",
-        author: "Andrea Hirata",
-        cover: "/covers/laskar-pelangi.jpg",
-      },
-      location: "Halaman 28",
-      addedAt: "3 hari yang lalu",
-    },
-    {
-      id: 3,
-      text: "Ketika kita menganggap suatu hal tidak penting, maka kita akan kehilangan momen belajar yang sangat berharga.",
-      note: "Perspektif menarik tentang kesempatan belajar dalam keseharian.",
-      color: "green",
-      book: {
-        id: 3,
-        title: "Filosofi Teras",
-        author: "Henry Manampiring",
-        cover: "/covers/filosofi-teras.jpg",
-      },
-      location: "Halaman 42",
-      addedAt: "1 minggu yang lalu",
-    },
-    {
-      id: 4,
-      text: "Tidak ada yang namanya kebetulan. Takdir seseorang adalah akumulasi dari setiap keputusan yang ia buat selama hidupnya.",
-      note: "",
-      color: "yellow",
-      book: {
-        id: 4,
-        title: "Hujan",
-        author: "Tere Liye",
-        cover: "/covers/hujan.jpg",
-      },
-      location: "Halaman 74",
-      addedAt: "2 minggu yang lalu",
-    },
-  ];
+export default function AnnotationsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
-  const getColorClass = (color) => {
+  // Filter anotasi berdasarkan pencarian dan warna
+  const filteredAnnotations = userAnnotations.filter((annotation) => {
+    const matchesQuery =
+      annotation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      annotation.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      annotation.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (annotation.note &&
+        annotation.note.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesColor = selectedColor
+      ? annotation.color === selectedColor
+      : true;
+
+    return matchesQuery && matchesColor;
+  });
+
+  // Format tanggal ke format lokal Indonesia
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Mendapatkan warna latar belakang berdasarkan warna anotasi
+  const getHighlightColor = (color: string) => {
     switch (color) {
       case "yellow":
-        return "bg-amber-100 border-amber-400";
+        return "bg-yellow-200";
       case "green":
-        return "bg-green-100 border-green-400";
+        return "bg-green-200";
       case "blue":
-        return "bg-blue-100 border-blue-400";
+        return "bg-blue-200";
+      case "purple":
+        return "bg-purple-200";
+      case "pink":
+        return "bg-pink-200";
       default:
-        return "bg-amber-100 border-amber-400";
+        return "bg-yellow-200";
     }
   };
 
-  const confirmDelete = (annotation) => {
-    setSelectedAnnotation(annotation);
-    setShowDeleteModal(true);
-  };
-
-  const openEditModal = (annotation) => {
-    setSelectedAnnotation(annotation);
-    setNoteText(annotation.note);
-    setShowEditModal(true);
-  };
-
-  const handleDelete = () => {
-    // Logic to delete annotation would go here
-    console.log(`Deleting annotation: ${selectedAnnotation.id}`);
-    setShowDeleteModal(false);
-  };
-
-  const handleSaveNote = () => {
-    // Logic to save edited note would go here
-    console.log(`Saving note for annotation: ${selectedAnnotation.id}`);
-    console.log(`New note: ${noteText}`);
-    setShowEditModal(false);
-  };
-
   return (
-    <div className="p-6">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 mr-12 lg:mr-0">
-        <h1 className="text-2xl font-bold">Anotasi Saya</h1>
-
-        <div className="flex gap-3">
-          <div className="relative max-w-md w-full">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search size={18} className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              className="input input-bordered pl-10 w-full"
-              placeholder="Cari dalam anotasi..."
-            />
-          </div>
-
-          <button
-            className="btn btn-outline gap-2"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={18} />
-            Filter
-          </button>
+    <div className="flex">
+      <UserSidebar />
+      <div className="flex-1 p-4 md:p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">Anotasi Saya</h1>
         </div>
-      </div>
 
-      {/* Filters Panel */}
-      {showFilters && (
-        <div className="bg-base-100 p-4 rounded-lg shadow-md mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <h3 className="font-medium mb-2">Buku</h3>
-              <select className="select select-bordered w-full">
-                <option value="">Semua Buku</option>
-                <option value="1">Laskar Pelangi</option>
-                <option value="3">Filosofi Teras</option>
-                <option value="4">Hujan</option>
-              </select>
-            </div>
-
-            <div>
-              <h3 className="font-medium mb-2">Warna Highlight</h3>
-              <div className="flex gap-3">
-                <label className="cursor-pointer label justify-start gap-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checkbox-warning"
-                  />
-                  <span className="label-text">Kuning</span>
-                </label>
-                <label className="cursor-pointer label justify-start gap-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checkbox-success"
-                  />
-                  <span className="label-text">Hijau</span>
-                </label>
-                <label className="cursor-pointer label justify-start gap-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checkbox-info"
-                  />
-                  <span className="label-text">Biru</span>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-medium mb-2">Urutkan</h3>
-              <select className="select select-bordered w-full">
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="a-z">Buku (A-Z)</option>
-              </select>
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="form-control md:flex-1">
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Cari anotasi..."
+                className="input input-bordered w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button className="btn btn-square">
+                <Search size={18} />
+              </button>
             </div>
           </div>
 
-          <div className="flex justify-end mt-4">
-            <button className="btn btn-sm btn-ghost">Reset</button>
-            <button className="btn btn-sm btn-primary ml-2">Terapkan</button>
+          <div className="flex gap-2">
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-outline">
+                <div className="flex items-center gap-2">
+                  <Highlighter size={16} />
+                  <span>Filter Warna</span>
+                </div>
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <a onClick={() => setSelectedColor(null)}>Semua Warna</a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSelectedColor("yellow")}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-yellow-200"></span>{" "}
+                    Kuning
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSelectedColor("green")}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-green-200"></span>{" "}
+                    Hijau
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSelectedColor("blue")}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-blue-200"></span>{" "}
+                    Biru
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSelectedColor("purple")}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-purple-200"></span>{" "}
+                    Ungu
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSelectedColor("pink")}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-4 h-4 rounded-full bg-pink-200"></span>{" "}
+                    Merah Muda
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Annotations List */}
-      <div className="space-y-6">
-        {annotations.length > 0 ? (
-          annotations.map((annotation) => (
-            <div
-              key={annotation.id}
-              className="bg-base-100 rounded-lg shadow overflow-hidden"
-            >
-              <div className="p-4">
-                {/* Book Info */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="relative w-10 h-14 shrink-0">
-                    <img
-                      src={annotation.book.cover || `/api/placeholder/40/56`}
-                      alt={`Cover buku ${annotation.book.title}`}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{annotation.book.title}</h3>
-                    <p className="text-sm opacity-70">
-                      {annotation.book.author}
-                    </p>
-                  </div>
-                  <div className="ml-auto text-xs opacity-70">
-                    {annotation.location} • {annotation.addedAt}
-                  </div>
-                </div>
+        {filteredAnnotations.length > 0 ? (
+          <div className="space-y-4">
+            {filteredAnnotations.map((annotation) => (
+              <div
+                key={annotation.id}
+                className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
+              >
+                <div className="card-body">
+                  <div className="flex flex-col md:flex-row md:items-start gap-4">
+                    <div className="w-full md:w-1/6">
+                      <div className="aspect-[2/3] relative bg-base-200 rounded-lg overflow-hidden">
+                        {annotation.coverImage ? (
+                          <img
+                            src={annotation.coverImage}
+                            alt={annotation.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center">
+                            <BookOpen size={48} className="opacity-30" />
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="mt-2 font-medium text-sm">
+                        {annotation.title}
+                      </h3>
+                      <p className="text-xs opacity-70">{annotation.author}</p>
+                    </div>
 
-                {/* Highlighted Text */}
-                <div
-                  className={`${getColorClass(
-                    annotation.color
-                  )} border-l-4 p-3 rounded-r mb-3`}
-                >
-                  <p className="relative pl-6">
-                    <Highlighter
-                      size={16}
-                      className="absolute left-0 top-1 opacity-50"
-                    />
-                    <span className="italic">"{annotation.text}"</span>
-                  </p>
-                </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-4 h-4 rounded-full ${getHighlightColor(
+                              annotation.color
+                            )}`}
+                          ></div>
+                          <div className="badge badge-outline">
+                            {annotation.file_type.toUpperCase()}
+                          </div>
+                          <span className="text-sm opacity-70">
+                            {formatDate(annotation.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="btn btn-ghost btn-sm btn-circle">
+                            <Edit size={16} />
+                          </button>
+                          <button className="btn btn-ghost btn-sm btn-circle text-error">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
 
-                {/* Note */}
-                {annotation.note && (
-                  <div className="bg-base-200 p-3 rounded-lg mb-3">
-                    <p className="text-sm">{annotation.note}</p>
+                      <div
+                        className={`p-4 my-3 rounded-md ${getHighlightColor(
+                          annotation.color
+                        )}`}
+                      >
+                        <p className="text-sm md:text-base italic">
+                          {annotation.text}
+                        </p>
+                      </div>
+
+                      {annotation.note && (
+                        <div className="bg-base-200 p-4 rounded-md">
+                          <p className="text-sm">
+                            <span className="font-medium">Catatan: </span>
+                            {annotation.note}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="card-actions justify-end mt-4">
+                        <Link
+                          href={`/buku/${annotation.bookId}/baca?format=${
+                            annotation.file_type
+                          }&location=${encodeURIComponent(
+                            annotation.location
+                          )}`}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Buka di Buku
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex justify-end gap-2">
-                  <button
-                    className="btn btn-ghost btn-sm btn-square"
-                    onClick={() => confirmDelete(annotation)}
-                  >
-                    <Trash2 size={16} className="text-error" />
-                  </button>
-                  <button
-                    className="btn btn-ghost btn-sm btn-square"
-                    onClick={() => openEditModal(annotation)}
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <Link
-                    href={`/baca/${annotation.book.id}?annotation=${annotation.id}`}
-                    className="btn btn-primary btn-sm gap-1"
-                  >
-                    Buka <ChevronRight size={16} />
-                  </Link>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
-          <div className="bg-base-100 rounded-lg shadow py-12 text-center">
-            <Highlighter size={48} className="mx-auto opacity-20 mb-4" />
-            <h3 className="text-lg font-medium mb-2">Belum Ada Anotasi</h3>
-            <p className="text-base-content/70 mb-4">
-              Sorot dan catat bagian penting saat Anda membaca.
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="opacity-30 mb-4">
+              <Highlighter size={64} />
+            </div>
+            <h3 className="text-xl font-medium mb-2">Belum Ada Anotasi</h3>
+            <p className="opacity-70 mb-4">
+              Anda belum membuat anotasi pada buku yang Anda baca. Anotasi
+              membantu Anda mencatat dan mengingat kutipan penting.
             </p>
-            <Link href="/katalog" className="btn btn-primary">
-              Mulai Membaca
+            <Link href="/buku" className="btn btn-primary">
+              Jelajahi Buku
             </Link>
           </div>
         )}
       </div>
-
-      {/* Pagination */}
-      {annotations.length > 0 && (
-        <div className="flex justify-center my-8">
-          <div className="btn-group">
-            <button className="btn btn-sm">«</button>
-            <button className="btn btn-sm btn-active">1</button>
-            <button className="btn btn-sm">2</button>
-            <button className="btn btn-sm">»</button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Hapus Anotasi</h3>
-            <p className="py-4">
-              Apakah Anda yakin ingin menghapus anotasi ini dari buku
-              <span className="font-medium">
-                {" "}
-                "{selectedAnnotation.book.title}"
-              </span>
-              ?
-            </p>
-            <div className="modal-action">
-              <button
-                className="btn btn-ghost"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Batal
-              </button>
-              <button className="btn btn-error" onClick={handleDelete}>
-                Hapus
-              </button>
-            </div>
-          </div>
-          <div
-            className="modal-backdrop"
-            onClick={() => setShowDeleteModal(false)}
-          ></div>
-        </div>
-      )}
-
-      {/* Edit Note Modal */}
-      {showEditModal && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Edit Catatan</h3>
-
-            <div
-              className={`${getColorClass(
-                selectedAnnotation.color
-              )} border-l-4 p-3 rounded-r my-4`}
-            >
-              <p className="italic">"{selectedAnnotation.text}"</p>
-            </div>
-
-            <div className="form-control">
-              <textarea
-                className="textarea textarea-bordered h-32"
-                placeholder="Tambahkan catatan Anda..."
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-              ></textarea>
-            </div>
-
-            <div className="modal-action">
-              <button
-                className="btn btn-ghost"
-                onClick={() => setShowEditModal(false)}
-              >
-                Batal
-              </button>
-              <button className="btn btn-primary" onClick={handleSaveNote}>
-                Simpan
-              </button>
-            </div>
-          </div>
-          <div
-            className="modal-backdrop"
-            onClick={() => setShowEditModal(false)}
-          ></div>
-        </div>
-      )}
     </div>
   );
 }

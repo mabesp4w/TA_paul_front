@@ -1,4 +1,8 @@
 /** @format */
+
+import { BookFileType } from "./BookFileType";
+import { CategoryType } from "./CategoryType";
+
 // book
 export type BookType = {
   id: string;
@@ -7,5 +11,7 @@ export type BookType = {
   publisher: string;
   year: number | string;
   cover_image: string;
-  categories: string;
+  total_pages: number;
+  categories: CategoryType[];
+  files: BookFileType[];
 };

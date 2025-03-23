@@ -1,25 +1,21 @@
 /** @format */
 
-import UserSidebar from "@/components/sidebar/UserSidebar";
 import React from "react";
 import Auth from "../Auth";
+import Navbar from "@/components/navbar/NabarComp";
+import Footer from "@/components/footer/FooterComp";
 
 type Props = {
   children: React.ReactNode;
 };
 const layout = ({ children }: Props) => {
   return (
-    <>
-      <div className="drawer lg:drawer-open">
-        <input id="drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col">
-          {/* Page content here */}
-          <div className="w-full min-h-screen bg-base-100">{children}</div>
-        </div>
-        <UserSidebar />
-        <Auth />
-      </div>
-    </>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-1">{children}</div>
+      <Footer />
+      <Auth />
+    </div>
   );
 };
 
