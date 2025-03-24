@@ -92,9 +92,9 @@ export interface Annotation {
   fileType: string;
   location: string;
   text: string;
-  note?: string;
-  color: "yellow" | "green" | "blue";
-  createdAt: string;
+  note?: string | null;
+  color: string;
+  createdAt?: string;
   book?: Book;
 }
 

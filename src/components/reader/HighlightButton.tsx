@@ -5,13 +5,15 @@
 
 import { useState } from "react";
 import { Highlighter } from "lucide-react";
+import { Annotation } from "@/types";
+import useAnnotations from "@/stores/crud/annotations";
 
 interface HighlightButtonProps {
   bookId: string;
   fileType: string;
   selectedText: string;
   currentLocation: string;
-  onAnnotationCreated?: (annotation: any) => void;
+  onAnnotationCreated?: (annotation: Annotation) => void;
 }
 
 const HighlightButton = ({
@@ -24,34 +26,41 @@ const HighlightButton = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [note, setNote] = useState("");
   const [color, setColor] = useState("yellow");
+  const { addData } = useAnnotations(); // Gunakan store annotations
 
   const handleCreateHighlight = async () => {
     try {
-      // Untuk sementara, buat objek tiruan
+      // Buat objek anotasi untuk disimpan
       const newAnnotation = {
-        id: Math.random().toString(36).substring(2, 9),
-        book_id: bookId,
+        book: bookId,
         file_type: fileType,
         location: currentLocation,
         text: selectedText,
         note: note || undefined,
         color,
-        created_at: new Date().toISOString(),
       };
 
-      if (onAnnotationCreated) {
-        onAnnotationCreated(newAnnotation);
+      // Simpan ke database menggunakan store
+      const response = await addData(newAnnotation as any);
+
+      if (response.status === "berhasil tambah") {
+        if (onAnnotationCreated && response.data && response.data.data) {
+          onAnnotationCreated(response.data.data);
+        }
+
+        // Reset state dan tutup modal
+        setIsModalOpen(false);
+        setNote("");
+
+        // Tambahkan notifikasi sukses di sini jika perlu
+        // misalnya: toast.success("Highlight berhasil disimpan");
+      } else {
+        throw new Error(response.data || "Gagal menyimpan highlight");
       }
-
-      setIsModalOpen(false);
-      setNote("");
-
-      // Tampilkan notifikasi sukses
-      // ...
     } catch (error) {
       console.error("Error creating annotation:", error);
       // Tampilkan notifikasi error
-      // ...
+      // misalnya: toast.error("Gagal menyimpan highlight");
     }
   };
 

@@ -15,8 +15,11 @@ export default function BookReaderPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params.id as string;
-  const format = searchParams.get("type") || "epub";
+  const format = searchParams.get("type") || "EPUB";
+  // state
   const [file, setFile] = useState<BookFileType | null>(null);
+  const [selectedText, setSelectedText] = useState("");
+  const [currentLocation, setCurrentLocation] = useState("");
 
   // store
   const { setShowBook, showDtBook } = useBook();
@@ -35,13 +38,28 @@ export default function BookReaderPage() {
     }
   }, [showDtBook, format]);
 
+  const handleTextSelection = (text: string, location: string) => {
+    setSelectedText(text);
+    setCurrentLocation(location);
+  };
+
   return showDtBook && file ? (
     <div className="">
-      <ReaderLayout bookId={showDtBook.id} bookTitle={showDtBook.title}>
+      <ReaderLayout
+        bookId={showDtBook.id}
+        bookTitle={showDtBook.title}
+        selectedText={selectedText}
+        currentLocation={currentLocation}
+        fileType={format}
+      >
         {format === "PDF" ? (
           <PdfReader bookId={showDtBook.id} file_book={file.file_book} />
         ) : (
-          <EpubReader bookId={showDtBook.id} file_book={file.file_book} />
+          <EpubReader
+            bookId={showDtBook.id}
+            file_book={file.file_book}
+            onTextSelection={handleTextSelection}
+          />
         )}
       </ReaderLayout>
     </div>

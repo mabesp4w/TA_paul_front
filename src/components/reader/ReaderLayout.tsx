@@ -166,6 +166,10 @@ const ReaderLayout = ({
               fileType={fileType || ""}
               selectedText={selectedText}
               currentLocation={currentLocation}
+              onAnnotationCreated={(annotation) => {
+                // Optional: Lakukan sesuatu saat anotasi berhasil dibuat
+                console.log("Anotasi berhasil dibuat:", annotation);
+              }}
             />
             <button className="flex flex-col items-center justify-center">
               <Search size={20} />

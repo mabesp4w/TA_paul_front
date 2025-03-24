@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { ReactReaderStyle } from "react-reader";
 import { useSettingContext } from "@/context/SettingContext";
+import useAnnotations from "@/stores/crud/annotations";
 
 // Import ReactReader with dynamic import to avoid SSR issues
 const ReactReader = dynamic(
@@ -16,6 +17,7 @@ const ReactReader = dynamic(
 interface EpubReaderProps {
   bookId: string;
   file_book: string;
+  onTextSelection?: (text: string, location: string) => void;
 }
 
 // Definisikan interface untuk pengaturan pembaca
@@ -26,14 +28,32 @@ interface ReaderSettings {
   lineSpacing: number;
 }
 
-const EpubReader = ({ bookId, file_book }: EpubReaderProps) => {
+const EpubReader = ({
+  bookId,
+  file_book,
+  onTextSelection,
+}: EpubReaderProps) => {
   // context
   const { changeSetting } = useSettingContext();
+  // state
   const [isLoading, setIsLoading] = useState(true);
   const [epubData, setEpubData] = useState<ArrayBuffer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<string | number>(0);
   const renditionRef = useRef<any>(null);
+  // store
+  const { setAnnotations, dtAnnotations } = useAnnotations();
+  // get dtAnnotations
+  useEffect(() => {
+    setAnnotations({
+      page: 1,
+      per_page: 100,
+      search: "",
+      sortby: "",
+      order: "",
+    });
+  }, []);
+  console.log({ dtAnnotations });
   const [readerSettings, setReaderSettings] = useState<ReaderSettings>({
     fontSize: 16,
     fontFamily: "sans-serif",
@@ -99,6 +119,21 @@ const EpubReader = ({ bookId, file_book }: EpubReaderProps) => {
       }
     }
   }, [changeSetting]);
+
+  const handleGetRendition = (rendition: any) => {
+    renditionRef.current = rendition;
+
+    // Terapkan pengaturan
+    applyReaderSettings(rendition, readerSettings);
+
+    // Deteksi teks yang dipilih
+    rendition.on("selected", (cfiRange: any, contents: any) => {
+      const selectedText = contents.window.getSelection().toString();
+      if (selectedText && onTextSelection) {
+        onTextSelection(selectedText, rendition.location.start.cfi);
+      }
+    });
+  };
 
   // Function to apply settings to rendition
   const applyReaderSettings = (rendition: any, settings: ReaderSettings) => {
@@ -176,10 +211,6 @@ const EpubReader = ({ bookId, file_book }: EpubReaderProps) => {
     setLocation(epubcifi);
   };
 
-  // Determine background color based on theme
-  // const backgroundColor =
-  //   readerSettings.theme === "dark" ? "#121212" : "#f8f8f8";
-
   return (
     <div className="w-full h-full">
       {/* EPUB Reader Component */}
@@ -188,12 +219,7 @@ const EpubReader = ({ bookId, file_book }: EpubReaderProps) => {
         title={""}
         location={location}
         locationChanged={locationChanged}
-        getRendition={(rendition) => {
-          renditionRef.current = rendition;
-
-          // Apply all reader settings when rendition is ready
-          applyReaderSettings(rendition, readerSettings);
-        }}
+        getRendition={handleGetRendition}
         swipeable={false}
         epubOptions={{
           flow: "paginated", // or "scrolled"
