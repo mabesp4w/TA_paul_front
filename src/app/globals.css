@@ -115,3 +115,9 @@
   font-display: swap;
   src: url("/fonts/Comic-Neue/ComicNeue-LightItalic.ttf") format("truetype");
 }
+
+.epubjs-hl {
+  fill-opacity: 0.3;
+  mix-blend-mode: multiply;
+  border-radius: 3px;
+}

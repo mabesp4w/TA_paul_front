@@ -38,10 +38,12 @@ export default function BookReaderPage() {
     }
   }, [showDtBook, format]);
 
-  const handleTextSelection = (text: string, location: string) => {
+  const handleTextSelection = (text: any, location: string) => {
     setSelectedText(text);
     setCurrentLocation(location);
   };
+
+  console.log({ selectedText });
 
   return showDtBook && file ? (
     <div className="">

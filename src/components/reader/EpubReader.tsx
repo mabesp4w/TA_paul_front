@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { ReactReaderStyle } from "react-reader";
 import { useSettingContext } from "@/context/SettingContext";
 import useAnnotations from "@/stores/crud/annotations";
+import { Annotation } from "@/types";
 
 // Import ReactReader with dynamic import to avoid SSR issues
 const ReactReader = dynamic(
@@ -60,6 +61,15 @@ const EpubReader = ({
     theme: "light",
     lineSpacing: 1.2,
   });
+
+  // Define color mapping for annotations
+  const colorMap = {
+    yellow: "#ECC94B", // yellow-500
+    green: "#48BB78", // green-500
+    blue: "#4299E1", // blue-500
+    purple: "#9F7AEA", // purple-500
+    pink: "#ED64A6", // pink-500
+  };
 
   useEffect(() => {
     // Reset states when component mounts or file_book changes
@@ -120,19 +130,109 @@ const EpubReader = ({
     }
   }, [changeSetting]);
 
+  // Apply annotations from dtAnnotations when rendition and data are available
+  useEffect(() => {
+    if (renditionRef.current && dtAnnotations?.data?.length > 0) {
+      // Remove existing annotations one by one instead of using clear()
+      try {
+        // Check if annotations exists and has a removeAll method
+        if (
+          renditionRef.current.annotations &&
+          typeof renditionRef.current.annotations.removeAll === "function"
+        ) {
+          renditionRef.current.annotations.removeAll();
+        } else {
+          console.log(
+            "Annotations object doesn't have removeAll method, skipping clear"
+          );
+        }
+      } catch (err) {
+        console.error("Error removing existing annotations:", err);
+      }
+
+      // Add each annotation from the data
+      dtAnnotations.data.forEach((annotation: Annotation) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const color = colorMap[annotation.color] || colorMap.yellow; // Default to yellow if color not found
+
+          renditionRef.current.annotations.add(
+            "highlight",
+            annotation.location,
+            {}, // No additional data needed
+            (e: MouseEvent) => {
+              // Handle click on annotation
+              console.log("Annotation clicked:", annotation.id, e);
+              // You could show the note or other actions here
+            },
+            `annotation-${annotation.id}`, // Unique class for this annotation
+            { fill: color }
+          );
+        } catch (err) {
+          console.error(
+            `Failed to apply annotation at ${annotation.location}:`,
+            err
+          );
+        }
+      });
+    }
+  }, [dtAnnotations, renditionRef.current]);
+
   const handleGetRendition = (rendition: any) => {
     renditionRef.current = rendition;
 
-    // Terapkan pengaturan
+    // Apply settings
     applyReaderSettings(rendition, readerSettings);
 
-    // Deteksi teks yang dipilih
+    // Apply custom CSS for annotations
+    rendition.hooks.content.register((contents: any) => {
+      const document = contents.window.document;
+      if (document) {
+        const css = `
+          .epubjs-hl {
+            fill-opacity: 0.25;
+            mix-blend-mode: multiply;
+            border-radius: 3px;
+          }
+        `;
+        const style = document.createElement("style");
+        style.appendChild(document.createTextNode(css));
+        document.head.appendChild(style);
+      }
+    });
+
+    // Detect selected text
     rendition.on("selected", (cfiRange: any, contents: any) => {
       const selectedText = contents.window.getSelection().toString();
       if (selectedText && onTextSelection) {
-        onTextSelection(selectedText, rendition.location.start.cfi);
+        onTextSelection(selectedText, cfiRange);
       }
     });
+
+    // Apply existing annotations after rendition is ready
+    if (dtAnnotations?.data?.length > 0) {
+      dtAnnotations.data.forEach((annotation: Annotation) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const color = colorMap[annotation.color] || colorMap.yellow;
+
+          rendition.annotations.add(
+            "highlight",
+            annotation.location,
+            {},
+            (e: MouseEvent) => {
+              console.log("Annotation clicked:", annotation.id, e);
+            },
+            `annotation-${annotation.id}`,
+            { fill: color }
+          );
+        } catch (err) {
+          console.error(`Failed to apply annotation:`, err);
+        }
+      });
+    }
   };
 
   // Function to apply settings to rendition
