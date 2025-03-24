@@ -102,6 +102,14 @@ const BodyForm: FC<Props> = ({
           required
         />
       )}
+      <InputText
+        label={`Deskripsi`}
+        name="description"
+        register={register}
+        addClass="col-span-8"
+        required
+        errors={errors.description}
+      />
 
       <InputFile
         label={`Cover Buku`}

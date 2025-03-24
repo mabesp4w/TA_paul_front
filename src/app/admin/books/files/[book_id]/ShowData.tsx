@@ -54,8 +54,8 @@ const ShowData: FC<Props> = ({ setDelete, setEdit, book_id }) => {
   }, [search, sortby, order]);
 
   // table
-  const headTable = ["No", "Tipe File", "File", "Asli", "Aksi"];
-  const tableBodies = ["file_type", "file_book", "is_original"];
+  const headTable = ["No", "Tipe File", "File", "Aksi"];
+  const tableBodies = ["file_type", "file_book"];
 
   if (isLoading) {
     return (

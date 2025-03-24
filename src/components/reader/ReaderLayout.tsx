@@ -1,8 +1,9 @@
 /** @format */
 
+// src/components/reader/ReaderLayout.tsx
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,11 +15,13 @@ import {
   ChevronLeft,
   ChevronRight,
   List,
+  X,
 } from "lucide-react";
 import BookmarkButton from "./BookmarkButton";
 import HighlightButton from "./HighlightButton";
 import BookmarkList from "./BookmarkList";
 import AnnotationList from "./AnnotationList";
+import ReaderSettings from "./ReaderSettings";
 
 interface ReaderLayoutProps {
   bookId: string;
@@ -28,6 +31,8 @@ interface ReaderLayoutProps {
   selectedText?: string;
   onBookmarkSelect?: (location: string) => void;
   onAnnotationSelect?: (location: string) => void;
+  onSettingsChange?: (settings: any) => void;
+  fileType?: string;
 }
 
 const ReaderLayout = ({
@@ -38,159 +43,152 @@ const ReaderLayout = ({
   selectedText = "",
   onBookmarkSelect = () => {},
   onAnnotationSelect = () => {},
+  onSettingsChange = () => {},
+  fileType,
 }: ReaderLayoutProps) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "contents" | "bookmarks" | "annotations"
-  >("contents");
-  const [fileType, setFileType] = useState(""); // Akan diambil dari parameter URL atau props
+  const [isMobile, setIsMobile] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const drawerCheckboxRef = useRef<HTMLInputElement>(null);
+
+  // Initial reader settings
+  const [readerSettings, setReaderSettings] = useState({
+    fontSize: 16,
+    fontFamily: "serif",
+    theme: "light", // Default theme dari DaisyUI
+    lineSpacing: 1.5,
+  });
+
+  // Deteksi layar mobile
   useEffect(() => {
-    setFileType("epub");
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Set pada awal load
+    checkIsMobile();
+
+    // Update ketika resize
+    window.addEventListener("resize", checkIsMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
+  // Apply theme to html element
+  useEffect(() => {
+    // Set the data-theme attribute on the html element
+    document.documentElement.setAttribute("data-theme", readerSettings.theme);
+
+    return () => {
+      // You might want to restore the previous theme on unmount
+      // This depends on your app's theme management approach
+    };
+  }, [readerSettings.theme]);
+
+  const handleSettingsChange = (newSettings: any) => {
+    setReaderSettings(newSettings);
+    onSettingsChange(newSettings);
+
+    // Save settings to localStorage for persistence
+    localStorage.setItem("readerSettings", JSON.stringify(newSettings));
+  };
+
+  // Load saved settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("readerSettings");
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        setReaderSettings(parsedSettings);
+      } catch (e) {
+        console.error("Error parsing saved reader settings:", e);
+      }
+    } else {
+      localStorage.setItem("readerSettings", JSON.stringify(readerSettings));
+    }
+  }, []);
+
+  // Content style based on settings (font size, family, spacing)
+  const contentStyle = {
+    fontSize: `${readerSettings.fontSize}px`,
+    fontFamily: readerSettings.fontFamily,
+    lineHeight: readerSettings.lineSpacing,
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-base-100">
-      {/* Reader Header */}
-      <header className="navbar bg-base-200 shadow-md z-10">
-        <div className="navbar-start">
-          <Link href={`/buku/${bookId}`} className="btn btn-ghost btn-sm gap-1">
-            <ArrowLeft size={16} /> Kembali
-          </Link>
-        </div>
+    <div className="drawer drawer-end min-h-screen">
+      <input
+        id="reader-sidebar-drawer"
+        type="checkbox"
+        className="drawer-toggle"
+        ref={drawerCheckboxRef}
+      />
 
-        <div className="navbar-center">
-          <h1 className="text-lg font-medium truncate max-w-md">{bookTitle}</h1>
-        </div>
+      <div className="drawer-content flex flex-col">
+        {/* Reader Header */}
+        <header className="navbar bg-base-200 shadow-md z-10">
+          <div className="navbar-start">
+            <Link
+              href={`/buku/${bookId}`}
+              className="btn btn-ghost btn-sm gap-1"
+            >
+              <ArrowLeft size={16} /> Kembali
+            </Link>
+          </div>
 
-        <div className="navbar-end">
-          <button
-            className="btn btn-ghost btn-circle"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            <Menu size={20} />
-          </button>
-        </div>
-      </header>
+          <div className="navbar-center">
+            <h1 className="text-lg font-medium truncate max-w-md">
+              {bookTitle}
+            </h1>
+          </div>
+        </header>
 
-      <div className="flex flex-1 relative">
-        {/* Reader Content */}
-        <main className="flex-1 flex flex-col items-center p-4">
-          <div className="w-full max-w-3xl mx-auto flex items-center mb-4">
-            <button className="btn btn-ghost btn-circle">
-              <ChevronLeft size={24} />
-            </button>
-            <div className="flex-1 text-center text-sm opacity-70">
-              Halaman 45 dari 230
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col items-center md:p-4">
+            {/* Reader Content */}
+            <div
+              className="w-full max-w-3xl mx-auto bg-base-100 rounded-lg shadow-lg flex-1 overflow-hidden"
+              style={contentStyle}
+            >
+              {children}
             </div>
-            <button className="btn btn-ghost btn-circle">
-              <ChevronRight size={24} />
+          </main>
+
+          <footer className="btm-nav bg-base-200 shadow-lg z-10 h-16 flex">
+            <BookmarkButton
+              bookId={bookId}
+              fileType={fileType || ""}
+              currentLocation={currentLocation}
+            />
+            <HighlightButton
+              bookId={bookId}
+              fileType={fileType || ""}
+              selectedText={selectedText}
+              currentLocation={currentLocation}
+            />
+            <button className="flex flex-col items-center justify-center">
+              <Search size={20} />
+              <span className="btm-nav-label">Cari</span>
             </button>
-          </div>
-
-          <div className="w-full max-w-3xl mx-auto bg-base-200 rounded-lg shadow-lg flex-1">
-            {children}
-          </div>
-        </main>
-
-        {/* Reader Sidebar */}
-        <aside
-          className={`
-          fixed top-16 right-0 bottom-0 w-72 bg-base-200 shadow-lg transition-transform z-20
-          ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
-        `}
-        >
-          <div className="tabs w-full">
-            <a
-              className={`tab tab-bordered flex-1 ${
-                activeTab === "contents" ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab("contents")}
+            <button
+              className="flex flex-col items-center justify-center"
+              onClick={() => setIsSettingsOpen(true)}
             >
-              <List size={16} className="mr-1" /> Konten
-            </a>
-            <a
-              className={`tab tab-bordered flex-1 ${
-                activeTab === "bookmarks" ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab("bookmarks")}
-            >
-              <Bookmark size={16} className="mr-1" /> Bookmark
-            </a>
-            <a
-              className={`tab tab-bordered flex-1 ${
-                activeTab === "annotations" ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab("annotations")}
-            >
-              <Highlighter size={16} className="mr-1" /> Catatan
-            </a>
-          </div>
+              <Settings size={20} />
+              <span className="btm-nav-label">Pengaturan</span>
+            </button>
+          </footer>
+        </div>
 
-          <div className="overflow-y-auto h-[calc(100%-48px)]">
-            {activeTab === "contents" && (
-              <div className="p-4">
-                <h3 className="font-medium mb-2">Daftar Isi</h3>
-                <ul className="menu menu-compact">
-                  <li>
-                    <a>Bab 1: Pengenalan</a>
-                  </li>
-                  <li>
-                    <a>Bab 2: Dasar-dasar</a>
-                  </li>
-                  <li>
-                    <a className="active">Bab 3: Implementasi</a>
-                  </li>
-                  <li>
-                    <a>Bab 4: Studi Kasus</a>
-                  </li>
-                  <li>
-                    <a>Bab 5: Kesimpulan</a>
-                  </li>
-                </ul>
-              </div>
-            )}
-
-            {activeTab === "bookmarks" && (
-              <BookmarkList
-                bookId={bookId}
-                fileType={fileType}
-                onBookmarkSelect={onBookmarkSelect}
-              />
-            )}
-
-            {activeTab === "annotations" && (
-              <AnnotationList
-                bookId={bookId}
-                fileType={fileType}
-                onAnnotationSelect={onAnnotationSelect}
-              />
-            )}
-          </div>
-        </aside>
+        {/* Settings Modal */}
+        <ReaderSettings
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          settings={readerSettings}
+          onSettingsChange={handleSettingsChange}
+        />
       </div>
-
-      {/* Reader Footer Toolbar */}
-      <footer className="btm-nav bg-base-200 shadow-lg z-10 h-16">
-        <BookmarkButton
-          bookId={bookId}
-          fileType={fileType}
-          currentLocation={currentLocation}
-        />
-        <HighlightButton
-          bookId={bookId}
-          fileType={fileType}
-          selectedText={selectedText}
-          currentLocation={currentLocation}
-        />
-        <button className="flex flex-col items-center justify-center">
-          <Search size={20} />
-          <span className="btm-nav-label">Cari</span>
-        </button>
-        <button className="flex flex-col items-center justify-center">
-          <Settings size={20} />
-          <span className="btm-nav-label">Pengaturan</span>
-        </button>
-      </footer>
     </div>
   );
 };

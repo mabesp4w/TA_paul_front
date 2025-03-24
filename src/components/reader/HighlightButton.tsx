@@ -27,17 +27,6 @@ const HighlightButton = ({
 
   const handleCreateHighlight = async () => {
     try {
-      // Panggil API untuk membuat anotasi
-      // Contoh:
-      // const newAnnotation = await AnnotationService.create({
-      //   book_id: bookId,
-      //   file_type: fileType,
-      //   location: currentLocation,
-      //   text: selectedText,
-      //   note: note || undefined,
-      //   color
-      // });
-
       // Untuk sementara, buat objek tiruan
       const newAnnotation = {
         id: Math.random().toString(36).substring(2, 9),

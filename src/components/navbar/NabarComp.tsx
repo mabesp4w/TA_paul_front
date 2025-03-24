@@ -3,7 +3,7 @@
 // src/components/layout/Navbar.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, Menu, X, User, BookOpen } from "lucide-react";
@@ -13,6 +13,39 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  // Initial reader settings
+  const [readerSettings, setReaderSettings] = useState({
+    fontSize: 16,
+    fontFamily: "serif",
+    theme: "light", // Default theme dari DaisyUI
+    lineSpacing: 1.5,
+    margin: 2,
+  });
+
+  // Apply theme to html element
+  useEffect(() => {
+    // Set the data-theme attribute on the html element
+    document.documentElement.setAttribute("data-theme", readerSettings.theme);
+
+    return () => {
+      // You might want to restore the previous theme on unmount
+      // This depends on your app's theme management approach
+    };
+  }, [readerSettings.theme]);
+
+  // Load saved settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("readerSettings");
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        setReaderSettings(parsedSettings);
+      } catch (e) {
+        console.error("Error parsing saved reader settings:", e);
+      }
+    }
+  }, []);
 
   return (
     <div className="navbar bg-base-200 shadow-md sticky top-0 z-50">

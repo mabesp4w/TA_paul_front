@@ -3,17 +3,10 @@
 // src/components/book/BookGrid.tsx
 import { ReactNode } from "react";
 import BookCard from "./BookCard";
-
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  coverImage: string;
-  year: string;
-}
+import { BookType } from "@/types/BookType";
 
 interface BookGridProps {
-  books: Book[];
+  books: BookType[];
   title?: string;
   emptyMessage?: string;
   header?: ReactNode;
@@ -38,8 +31,8 @@ const BookGrid = ({
               id={book.id}
               title={book.title}
               author={book.author}
-              coverImage={book.coverImage}
-              year={book.year}
+              coverImage={book.cover_image}
+              year={book.year as string}
             />
           ))}
         </div>

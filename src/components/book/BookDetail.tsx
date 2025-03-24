@@ -1,9 +1,9 @@
 /** @format */
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Book, Heart, Share, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface BookDetailProps {
   id: string;
@@ -12,7 +12,7 @@ interface BookDetailProps {
   year: string;
   publisher?: string;
   description?: string;
-  coverImage?: string;
+  cover_image?: string;
   categories: { id: string; category_nm: string }[];
   files: { id: string; file_type: string }[];
 }
@@ -24,18 +24,33 @@ const BookDetail = ({
   year,
   publisher,
   description,
-  coverImage,
+  cover_image,
   categories,
   files,
 }: BookDetailProps) => {
-  const [activeTab, setActiveTab] = useState("deskripsi");
+  // state
+  const [activeTab, setActiveTab] = useState("format");
+  const [fileType, setFileType] = useState<string | null>(null);
+
+  // Effect untuk mengatur fileType secara otomatis saat komponen dimuat
+  useEffect(() => {
+    // Mengatur fileType ke tipe file pertama yang tersedia jika ada
+    if (files && files.length > 0) {
+      setFileType(files[0].file_type);
+    }
+  }, [files]); // Efek ini akan dijalankan setiap kali files berubah
+
+  // Fungsi untuk menangani perubahan pilihan fileType
+  const handleFileTypeChange = (type: string) => {
+    setFileType(type);
+  };
 
   return (
     <div className="card lg:card-side bg-base-100 shadow-xl">
       <figure className="lg:w-1/3 h-80 lg:h-auto relative bg-base-200">
-        {coverImage ? (
+        {cover_image ? (
           <Image
-            src={coverImage}
+            src={cover_image}
             alt={title}
             layout="fill"
             objectFit="cover"
@@ -52,15 +67,16 @@ const BookDetail = ({
         <h2 className="text-lg opacity-80">Oleh: {author}</h2>
 
         <div className="flex flex-wrap gap-2 my-2">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/kategori/${category.id}`}
-              className="badge badge-primary badge-outline"
-            >
-              {category.category_nm}
-            </Link>
-          ))}
+          {categories &&
+            categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/kategori/${category.id}`}
+                className="badge badge-accent badge-outline"
+              >
+                {category.category_nm}
+              </Link>
+            ))}
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm my-4">
@@ -89,7 +105,7 @@ const BookDetail = ({
           </a>
         </div>
 
-        <div className="tab-content">
+        <div>
           {activeTab === "deskripsi" && (
             <div className="text-sm opacity-80">
               {description || <em>Tidak ada deskripsi untuk buku ini.</em>}
@@ -100,12 +116,22 @@ const BookDetail = ({
             <div>
               <h3 className="font-semibold mb-2">Format yang tersedia:</h3>
               <div className="flex flex-wrap gap-2">
-                {files.length > 0 ? (
-                  files.map((file) => (
-                    <div key={file.id} className="badge badge-lg">
-                      {file.file_type.toUpperCase()}
-                    </div>
-                  ))
+                {files && files.length > 0 ? (
+                  <div className="file-type-badges flex flex-wrap gap-2">
+                    {files.map((file) => (
+                      <div
+                        key={file.id}
+                        className={`badge badge-lg cursor-pointer ${
+                          fileType === file.file_type
+                            ? "bg-accent text-white"
+                            : "badge-outline"
+                        }`}
+                        onClick={() => handleFileTypeChange(file.file_type)}
+                      >
+                        {file.file_type.toUpperCase()}
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <p className="text-sm opacity-70">
                     Tidak ada file yang tersedia
@@ -123,7 +149,10 @@ const BookDetail = ({
           <button className="btn btn-outline btn-accent gap-2">
             <Share size={16} /> Bagikan
           </button>
-          <Link href={`/buku/${id}/baca`} className="btn btn-primary gap-2">
+          <Link
+            href={`/buku/${id}/baca?type=${fileType}`}
+            className="btn btn-primary gap-2"
+          >
             <Book size={16} /> Baca Sekarang
           </Link>
         </div>

@@ -3,99 +3,40 @@
 // src/app/buku/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Filter, Search } from "lucide-react";
 import BookGrid from "@/components/book/BookGrid";
 import UserSidebar from "@/components/sidebar/UserSidebar";
+import useBook from "@/stores/crud/Book";
+import PaginationDef from "@/components/pagination/PaginationDef";
 
 // Contoh data untuk UI
-const allBooks = [
-  {
-    id: "1",
-    title: "Filosofi Teras",
-    author: "Henry Manampiring",
-    coverImage: "/images/filosofi-teras.jpg",
-    year: "2019",
-  },
-  {
-    id: "2",
-    title: "Atomic Habits",
-    author: "James Clear",
-    coverImage: "/images/atomic-habits.jpg",
-    year: "2018",
-  },
-  {
-    id: "3",
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    coverImage: "/images/sapiens.jpg",
-    year: "2015",
-  },
-  {
-    id: "4",
-    title: "Mindset",
-    author: "Carol S. Dweck",
-    coverImage: "/images/mindset.jpg",
-    year: "2006",
-  },
-  {
-    id: "5",
-    title: "Deep Work",
-    author: "Cal Newport",
-    coverImage: "/images/deep-work.jpg",
-    year: "2016",
-  },
-  {
-    id: "6",
-    title: "Educated",
-    author: "Tara Westover",
-    coverImage: "/images/educated.jpg",
-    year: "2018",
-  },
-  {
-    id: "7",
-    title: "Thinking, Fast and Slow",
-    author: "Daniel Kahneman",
-    coverImage: "/images/thinking.jpg",
-    year: "2011",
-  },
-  {
-    id: "8",
-    title: "Outliers",
-    author: "Malcolm Gladwell",
-    coverImage: "/images/outliers.jpg",
-    year: "2008",
-  },
-  {
-    id: "9",
-    title: "The Power of Habit",
-    author: "Charles Duhigg",
-    coverImage: "/images/power-habit.jpg",
-    year: "2012",
-  },
-  {
-    id: "10",
-    title: "Man's Search for Meaning",
-    author: "Viktor E. Frankl",
-    coverImage: "/images/mans-search.jpg",
-    year: "1946",
-  },
-  // Tambahkan lebih banyak buku sesuai kebutuhan
-];
 
 export default function BooksPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [yearRange, setYearRange] = useState<[number, number]>([1900, 2025]);
+  const [page, setPage] = useState(1);
+
+  const { setBook, dtBook } = useBook();
+
+  // get set book
+  const getData = useCallback(async () => {
+    await setBook({
+      page,
+      search: searchQuery,
+      sortby: "",
+      order: "",
+    });
+  }, [page, searchQuery, setBook]);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   // Filter buku berdasarkan pencarian
-  const filteredBooks = allBooks.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="flex">
@@ -220,7 +161,7 @@ export default function BooksPage() {
 
             <div className="flex justify-between items-center mb-4">
               <div className="text-sm opacity-70">
-                Menampilkan {filteredBooks.length} buku
+                Menampilkan {dtBook?.data.length} buku
               </div>
               <div className="flex gap-2 items-center">
                 <span className="text-sm hidden md:inline">Urutkan:</span>
@@ -234,19 +175,21 @@ export default function BooksPage() {
             </div>
 
             <BookGrid
-              books={filteredBooks}
+              books={dtBook?.data}
               emptyMessage="Tidak ada buku yang sesuai dengan filter Anda."
             />
 
             {/* Pagination */}
             <div className="flex justify-center mt-8">
-              <div className="join">
-                <button className="join-item btn btn-sm">«</button>
-                <button className="join-item btn btn-sm">1</button>
-                <button className="join-item btn btn-sm btn-active">2</button>
-                <button className="join-item btn btn-sm">3</button>
-                <button className="join-item btn btn-sm">»</button>
-              </div>
+              {dtBook?.last_page > 1 && (
+                <div className="mt-4">
+                  <PaginationDef
+                    currentPage={dtBook?.current_page}
+                    totalPages={dtBook?.last_page}
+                    setPage={setPage}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

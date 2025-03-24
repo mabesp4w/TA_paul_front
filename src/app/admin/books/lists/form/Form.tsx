@@ -40,7 +40,8 @@ const Form = ({ dtEdit, halaman }: Props) => {
     setValue("cover_image", "");
     setValue("publisher", "");
     setValue("year", "");
-    setValue("categories", "");
+    setValue("categories", []);
+    setValue("description", "");
   };
 
   // data edit
@@ -52,6 +53,7 @@ const Form = ({ dtEdit, halaman }: Props) => {
       setValue("publisher", dtEdit.publisher);
       setValue("year", parseInt(dtEdit.year as string));
       setValue("categories", dtEdit.categories);
+      setValue("description", dtEdit.description);
       setValue("cover_image", dtEdit.cover_image);
     } else {
       resetForm();

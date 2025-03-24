@@ -12,6 +12,7 @@ export type BookType = {
   year: number | string;
   cover_image: string;
   total_pages: number;
+  description?: string;
   categories: CategoryType[];
   files: BookFileType[];
 };
