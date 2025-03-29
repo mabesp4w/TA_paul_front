@@ -6,10 +6,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Menu, X, User, BookOpen } from "lucide-react";
+import { Search, Menu, X, User } from "lucide-react";
 import NavbarMobile from "./NavbarMobile";
 import useLogout from "@/stores/auth/logout";
 import handleLogout from "@/app/auth/logout/logout";
+import Image from "next/image";
 
 const Navbar = () => {
   const [loadLogout, setLoadLogout] = useState(false);
@@ -55,7 +56,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="navbar bg-base-200 shadow-md sticky top-0 z-50">
+    <div className="navbar bg-base-200 shadow-md sticky top-0 z-50 text-neutral">
       <div className="navbar-start">
         <div className="lg:hidden">
           <button
@@ -66,7 +67,8 @@ const Navbar = () => {
           </button>
         </div>
         <Link href="/dashboard" className="btn btn-ghost text-xl normal-case">
-          <BookOpen className="mr-2" /> Ruang Baca
+          <Image src="/images/logo.png" alt="Logo" width={70} height={70} />{" "}
+          Ruang Baca
         </Link>
       </div>
 

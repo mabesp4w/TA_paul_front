@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Highlighter,
+  Book,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -44,7 +45,7 @@ const UserSidebar = () => {
 
   const menuItems = [
     { icon: <Home size={20} />, label: "Beranda", path: "/dashboard" },
-    { icon: <BookOpen size={20} />, label: "Buku", path: "/buku" },
+    { icon: <Book size={20} />, label: "Buku", path: "/buku" },
     {
       icon: <BookOpen size={20} />,
       label: "Dibaca",
@@ -77,12 +78,14 @@ const UserSidebar = () => {
     >
       {isMobile ? (
         // Mobile: bottom navigation
-        <div className="btm-nav bg-base-200 shadow-t">
+        <div className="btm-nav bg-neutral-content shadow-t">
           {menuItems.slice(0, 5).map((item, index) => (
             <Link
               key={index}
               href={item.path}
-              className={pathname === item.path ? "active" : ""}
+              className={
+                pathname === item.path ? "bg-neutral text-neutral-content" : ""
+              }
             >
               {item.icon}
               <span className="btm-nav-label text-sm">{item.label}</span>

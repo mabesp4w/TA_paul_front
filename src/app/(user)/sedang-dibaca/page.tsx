@@ -3,51 +3,49 @@
 // src/app/sedang-dibaca/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Clock, BookOpen } from "lucide-react";
 import UserSidebar from "@/components/sidebar/UserSidebar";
-
-// Contoh data buku yang sedang dibaca
-const inProgressBooks = [
-  {
-    id: "1",
-    title: "Filosofi Teras",
-    author: "Henry Manampiring",
-    coverImage: "/images/filosofi-teras.jpg",
-    progress: 45,
-    lastRead: "2025-03-22T14:30:00",
-    format: "epub",
-  },
-  {
-    id: "2",
-    title: "Atomic Habits",
-    author: "James Clear",
-    coverImage: "/images/atomic-habits.jpg",
-    progress: 32,
-    lastRead: "2025-03-20T10:15:00",
-    format: "pdf",
-  },
-  {
-    id: "7",
-    title: "Thinking, Fast and Slow",
-    author: "Daniel Kahneman",
-    coverImage: "/images/thinking.jpg",
-    progress: 18,
-    lastRead: "2025-03-18T21:45:00",
-    format: "epub",
-  },
-];
+import useReadingProgress from "@/stores/crud/ReadingProgress";
+import { ReadingProgress } from "@/types";
+import Image from "next/image";
 
 export default function InProgressPage() {
+  // state
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Filter buku berdasarkan pencarian
-  const filteredBooks = inProgressBooks.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+  const [filteredData, setFilteredData] = useState<ReadingProgress[] | null>(
+    null
   );
+  // store
+  const { setReadingProgress, dtReadingProgress } = useReadingProgress();
+
+  // effect
+  useEffect(() => {
+    setReadingProgress({
+      page: 1,
+      per_page: 100,
+    });
+  }, [setReadingProgress]);
+
+  console.log({ dtReadingProgress });
+
+  useEffect(() => {
+    if (dtReadingProgress && dtReadingProgress.data) {
+      // Filter buku berdasarkan pencarian
+      const filteredBooks = dtReadingProgress.data.filter(
+        (progress) =>
+          progress.book_detail?.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          progress.book_detail?.author
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+      );
+
+      setFilteredData(filteredBooks);
+    }
+  }, [dtReadingProgress, searchQuery]);
 
   // Format tanggal ke format lokal Indonesia
   const formatDate = (dateString: string) => {
@@ -84,65 +82,78 @@ export default function InProgressPage() {
           </div>
         </div>
 
-        {filteredBooks.length > 0 ? (
+        {filteredData && filteredData.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBooks.map((book) => (
-              <div
-                key={book.id}
-                className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="card-body p-0">
-                  <div className="flex">
-                    <div className="w-1/3 h-48 bg-base-200">
-                      {book.coverImage ? (
-                        <img
-                          src={book.coverImage}
-                          alt={book.title}
-                          className="h-full w-full object-cover rounded-l-lg"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center">
-                          <BookOpen size={48} className="opacity-30" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-2/3 p-4">
-                      <h2 className="card-title text-lg">{book.title}</h2>
-                      <p className="text-sm opacity-70">{book.author}</p>
-
-                      <div className="mt-4">
-                        <div className="flex justify-between items-center mb-1 text-xs">
-                          <span>Progress</span>
-                          <span>{book.progress}%</span>
-                        </div>
-                        <div className="w-full bg-base-200 rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full"
-                            style={{ width: `${book.progress}%` }}
-                          ></div>
-                        </div>
+            {filteredData &&
+              filteredData.map((progress) => (
+                <div
+                  key={progress.id}
+                  className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <div className="card-body p-0">
+                    <div className="flex">
+                      <div className="w-1/3 h-48 bg-base-200">
+                        {progress.book_detail?.cover_image ? (
+                          <Image
+                            src={progress.book_detail?.cover_image}
+                            alt={progress.book_detail?.title}
+                            className="h-full w-full object-cover rounded-l-lg"
+                            width={100}
+                            height={100}
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center">
+                            <BookOpen size={48} className="opacity-30" />
+                          </div>
+                        )}
                       </div>
+                      <div className="w-2/3 p-4">
+                        <h2 className="card-title text-lg">
+                          {progress.book_detail?.title}
+                        </h2>
+                        <p className="text-sm opacity-70">
+                          {progress.book_detail?.author}
+                        </p>
 
-                      <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
-                        <Clock size={12} />
-                        <span>
-                          Terakhir dibaca: {formatDate(book.lastRead)}
-                        </span>
-                      </div>
+                        <div className="mt-2">
+                          <div className="flex items-center mb-1 gap-x-2 text-xs">
+                            <span>Tipe File:</span>
+                            <span>{progress.file_type}</span>
+                          </div>
+                          <div className="flex justify-between items-center mb-1 text-xs">
+                            <span>Progress</span>
+                            <span>{progress.completion_percentage}%</span>
+                          </div>
+                          <div className="w-full bg-base-200 rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full"
+                              style={{
+                                width: `${progress.completion_percentage}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
 
-                      <div className="card-actions justify-end mt-4">
-                        <Link
-                          href={`/buku/${book.id}/baca?format=${book.format}`}
-                          className="btn btn-primary btn-sm"
-                        >
-                          Lanjutkan
-                        </Link>
+                        <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
+                          <Clock size={12} />
+                          <span>
+                            Terakhir dibaca: {formatDate(progress.last_read)}
+                          </span>
+                        </div>
+
+                        <div className="card-actions justify-end mt-4">
+                          <Link
+                            href={`/buku/${progress.book_detail?.id}/baca?type=${progress.file_type}`}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Lanjutkan
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">

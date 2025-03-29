@@ -20,7 +20,7 @@ export interface Book {
   year: string;
   publisher?: string;
   description?: string;
-  coverImage?: string;
+  cover_image?: string;
   categories?: Category[];
   createdAt: string;
   updatedAt: string;
@@ -65,11 +65,12 @@ export interface Collection {
 export interface ReadingProgress {
   id: string;
   user: string;
-  book: string;
   file_type: string;
   current_location?: string;
   completion_percentage: number;
-  lastRead: string;
+  last_read: string;
+  book: string;
+  book_detail?: Book;
 }
 
 // Bookmark Types

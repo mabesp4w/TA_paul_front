@@ -4,8 +4,8 @@
 
 import handleLogout from "@/app/auth/logout/logout";
 import {
+  Book,
   Bookmark,
-  BookmarkIcon,
   BookOpen,
   Highlighter,
   Home,
@@ -18,6 +18,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import Cookies from "js-cookie";
+import { BiCategory, BiCollection } from "react-icons/bi";
 
 type Props = {
   isMobileMenuOpen: boolean;
@@ -81,7 +82,7 @@ const NavbarMobile = ({
                   className={pathname.startsWith("/buku") ? "active" : ""}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <BookOpen size={20} /> Koleksi Buku
+                  <Book size={20} /> Koleksi Buku
                 </Link>
               </li>
               <li>
@@ -90,7 +91,7 @@ const NavbarMobile = ({
                   className={pathname.startsWith("/kategori") ? "active" : ""}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <BookmarkIcon size={20} /> Kategori
+                  <BiCategory size={20} /> Kategori
                 </Link>
               </li>
               <li>
@@ -101,7 +102,7 @@ const NavbarMobile = ({
                   }
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Bookmark size={20} /> Koleksi Saya
+                  <BiCollection size={20} /> Koleksi Saya
                 </Link>
               </li>
               <li>
@@ -163,7 +164,7 @@ const NavbarMobile = ({
               ) : (
                 <li>
                   <Link
-                    href="/logout"
+                    href="#"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       handleLogout({ setLogout, setLoadLogout, router });
