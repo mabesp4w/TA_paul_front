@@ -50,8 +50,6 @@ const ReaderLayout = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const drawerCheckboxRef = useRef<HTMLInputElement>(null);
 
-  console.log({ isMobile });
-
   // Initial reader settings
   const [readerSettings, setReaderSettings] = useState({
     fontSize: 16,

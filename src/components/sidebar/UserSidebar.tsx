@@ -132,7 +132,7 @@ const UserSidebar = () => {
               <div className="bg-primary/10 p-4 rounded-lg text-sm">
                 <h4 className="font-medium mb-2">Aktivitas Terbaru</h4>
                 <p className="text-xs opacity-80">
-                  Lanjutkan membaca Filosofi Teras, halaman 45
+                  Lanjutkan membaca Filosofi Teras
                 </p>
               </div>
             )}

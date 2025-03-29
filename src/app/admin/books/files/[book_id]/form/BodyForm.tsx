@@ -28,7 +28,7 @@ const BodyForm: FC<Props> = ({ register, errors, setValue, watch, dtEdit }) => {
         fileEdit={dtEdit?.file_book}
         initialValue={dtEdit?.file_book || ""}
         watch={watch}
-        accept={"application/pdf"}
+        accept={"application/pdf,application/epub+zip"}
         required
       />
     </>

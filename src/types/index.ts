@@ -64,11 +64,11 @@ export interface Collection {
 // ReadingProgress Types
 export interface ReadingProgress {
   id: string;
-  userId: string;
-  bookId: string;
-  fileType: string;
-  currentLocation?: string;
-  completionPercentage: number;
+  user: string;
+  book: string;
+  file_type: string;
+  current_location?: string;
+  completion_percentage: number;
   lastRead: string;
 }
 

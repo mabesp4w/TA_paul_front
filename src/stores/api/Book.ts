@@ -8,49 +8,54 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { api } from "@/services/baseURL";
-import { CategoryType } from "@/types/CategoryType";
+import { BookType } from "@/types/BookType";
 import Cookies from "js-cookie";
-// api category
-
+// api books
 const token = Cookies.get("token");
 
 type Store = {
-  dtCategory: CategoryType[];
-  popularCategory: CategoryType[];
-  showCategory?: CategoryType;
-  setCategory: () => Promise<{
+  dtBooks: BookType[];
+  latestBooks: BookType[];
+  popularBooks: BookType[];
+  showBooks?: BookType;
+  setBooks: () => Promise<{
+    status: string;
+    data?: {};
+    error?: {};
+  }>;
+  setShowBooks: (id: string) => Promise<{
     status: string;
     data?: {};
     error?: {};
   }>;
 
-  setShowCategory: (id: string) => Promise<{
+  setLatestBooks: () => Promise<{
     status: string;
     data?: {};
     error?: {};
   }>;
-
-  setPopularCategory: () => Promise<{
+  setPopularBooks: () => Promise<{
     status: string;
     data?: {};
     error?: {};
   }>;
 };
 
-const useCategoryApi = create(
+const useBooksApi = create(
   devtools<Store>((set) => ({
-    dtCategory: [],
-    popularCategory: [],
-    setCategory: async () => {
+    dtBooks: [],
+    latestBooks: [],
+    popularBooks: [],
+    setBooks: async () => {
       try {
         const response = await api({
           method: "get",
-          url: `/categories`,
+          url: `/books`,
           headers: { Authorization: `Bearer ${token}` },
         });
         set((state) => ({
           ...state,
-          dtCategory: response.data,
+          dtBooks: response.data,
         }));
         return {
           status: "berhasil",
@@ -63,16 +68,16 @@ const useCategoryApi = create(
         };
       }
     },
-    setShowCategory: async (id) => {
+    setShowBooks: async (id) => {
       try {
         const response = await api({
           method: "get",
-          url: `/categories/${id}/`,
+          url: `/books/${id}`,
           headers: { Authorization: `Bearer ${token}` },
         });
         set((state) => ({
           ...state,
-          showCategory: response.data.data,
+          showBooks: response.data.data,
         }));
         return {
           status: "berhasil",
@@ -85,16 +90,39 @@ const useCategoryApi = create(
         };
       }
     },
-    setPopularCategory: async () => {
+
+    setLatestBooks: async () => {
       try {
         const response = await api({
           method: "get",
-          url: `/categories/popular`,
+          url: `/books/latest/`,
           headers: { Authorization: `Bearer ${token}` },
         });
         set((state) => ({
           ...state,
-          dtCategory: response.data,
+          latestBooks: response.data,
+        }));
+        return {
+          status: "berhasil",
+          data: response.data,
+        };
+      } catch (error: any) {
+        return {
+          status: "error",
+          error: error.response.data,
+        };
+      }
+    },
+    setPopularBooks: async () => {
+      try {
+        const response = await api({
+          method: "get",
+          url: `/books/popular/`,
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        set((state) => ({
+          ...state,
+          popularBooks: response.data,
         }));
         return {
           status: "berhasil",
@@ -110,4 +138,4 @@ const useCategoryApi = create(
   }))
 );
 
-export default useCategoryApi;
+export default useBooksApi;

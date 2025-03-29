@@ -23,6 +23,7 @@ const FormLogin: FC<Props> = ({ register, errors }) => {
         errors={errors.email}
         addClass="col-span-4"
         type="email"
+        labelClass="text-accent"
       />
       <InputText
         label="Password"
@@ -32,6 +33,7 @@ const FormLogin: FC<Props> = ({ register, errors }) => {
         minLength={3}
         errors={errors.password}
         type="password"
+        labelClass="text-accent"
       />
     </div>
   );

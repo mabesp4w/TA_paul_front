@@ -19,6 +19,7 @@ interface EpubReaderProps {
   bookId: string;
   file_book: string;
   onTextSelection?: (text: string, location: string) => void;
+  onLocationChange?: (location: string, completionPercentage?: number) => void;
 }
 
 // Definisikan interface untuk pengaturan pembaca
@@ -33,6 +34,7 @@ const EpubReader = ({
   bookId,
   file_book,
   onTextSelection,
+  onLocationChange,
 }: EpubReaderProps) => {
   // context
   const { changeSetting } = useSettingContext();
@@ -42,6 +44,9 @@ const EpubReader = ({
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<string | number>(0);
   const renditionRef = useRef<any>(null);
+  const [book, setBook] = useState<any>(null);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   // store
   const { setAnnotations, dtAnnotations } = useAnnotations();
   // get dtAnnotations
@@ -54,13 +59,15 @@ const EpubReader = ({
       order: "",
     });
   }, []);
-  console.log({ dtAnnotations });
+
   const [readerSettings, setReaderSettings] = useState<ReaderSettings>({
     fontSize: 16,
     fontFamily: "sans-serif",
     theme: "light",
     lineSpacing: 1.2,
   });
+
+  console.log({ totalPages, currentPage });
 
   // Define color mapping for annotations
   const colorMap = {
@@ -181,6 +188,37 @@ const EpubReader = ({
 
   const handleGetRendition = (rendition: any) => {
     renditionRef.current = rendition;
+
+    // Get book instance from rendition
+    const book = rendition.book;
+    setBook(book);
+
+    // Get total number of pages or locations
+    book.ready.then(() => {
+      const locations = book.locations;
+      if (!locations.total) {
+        // Generate locations if not already done
+        locations.generate().then(() => {
+          setTotalPages(locations.total);
+          // Perbarui posisi awal
+          if (location) {
+            const percentage = book.locations.percentageFromCfi(location);
+            if (percentage) {
+              setCurrentPage(Math.floor(percentage * locations.total));
+            }
+          }
+        });
+      } else {
+        setTotalPages(locations.total);
+        // Perbarui posisi awal
+        if (location) {
+          const percentage = book.locations.percentageFromCfi(location);
+          if (percentage) {
+            setCurrentPage(Math.floor(percentage * locations.total));
+          }
+        }
+      }
+    });
 
     // Apply settings
     applyReaderSettings(rendition, readerSettings);
@@ -305,10 +343,32 @@ const EpubReader = ({
   }
 
   const locationChanged = (epubcifi: string) => {
-    // epubcifi is a string like "epubcfi(/6/4[chap01ref]!/4/2/1:0)"
-    // Store the location to localStorage for persistence
     localStorage.setItem(`epub-location-${bookId}`, epubcifi);
     setLocation(epubcifi);
+
+    // Calculate percentage and page
+    if (book && book.locations && book.locations.total) {
+      const percentage = book.locations.percentageFromCfi(epubcifi);
+      if (percentage !== null) {
+        const calculatedPage = Math.floor(percentage * book.locations.total);
+        setCurrentPage(calculatedPage);
+
+        // Calculate completion as percentage (0-100)
+        const completionPercentage = Math.round(percentage * 100);
+
+        console.log({ completionPercentage });
+
+        // Call onLocationChange with additional percentage info
+        if (onLocationChange) {
+          onLocationChange(epubcifi, completionPercentage);
+        }
+      }
+    } else {
+      // Fallback if locations aren't generated yet
+      if (onLocationChange) {
+        onLocationChange(epubcifi);
+      }
+    }
   };
 
   return (

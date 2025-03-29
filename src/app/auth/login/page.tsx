@@ -124,7 +124,7 @@ const Login = () => {
                 </button>
               )}
             </div>
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 text-accent">
               <p>
                 Belum punya akun?{" "}
                 <Link href="/auth/register" className="text-primary">

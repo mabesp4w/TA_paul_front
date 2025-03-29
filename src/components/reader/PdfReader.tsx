@@ -13,14 +13,33 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 interface PdfReaderProps {
   bookId: string;
   file_book: string;
+  onPageChange?: (page: number, completionPercentage?: number) => void;
+  onDocumentLoaded?: (totalPages: number) => void;
 }
 
-const PdfReader = ({ file_book }: PdfReaderProps) => {
+const PdfReader = ({
+  file_book,
+  onPageChange,
+  bookId,
+  onDocumentLoaded,
+}: PdfReaderProps) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  // Load saved page from localStorage when component mounts
+  useEffect(() => {
+    const savedPage = localStorage.getItem(`pdf-page-${bookId}`);
+    if (savedPage) {
+      const pageNum = parseInt(savedPage, 10);
+      if (!isNaN(pageNum) && pageNum > 0) {
+        setPageNumber(pageNum);
+      }
+    }
+  }, [bookId]);
 
   // Fetch PDF sebagai blob untuk menghindari masalah CORS
   useEffect(() => {
@@ -45,11 +64,49 @@ const PdfReader = ({ file_book }: PdfReaderProps) => {
     fetchPdf();
   }, [file_book]);
 
+  // Calculate and report completion percentage when page changes
+  useEffect(() => {
+    if (!initialLoadComplete) {
+      // Jangan laporkan pada initial load, hanya set flag
+      if (numPages && pageNumber) {
+        setInitialLoadComplete(true);
+      }
+      return;
+    }
+
+    if (onPageChange && pageNumber && numPages) {
+      // Calculate completion percentage
+      const completionPercentage = Math.round((pageNumber / numPages) * 100);
+
+      // Save current page to localStorage
+      localStorage.setItem(`pdf-page-${bookId}`, pageNumber.toString());
+
+      // Report page change and completion percentage to parent
+      onPageChange(pageNumber, completionPercentage);
+    }
+  }, [pageNumber, numPages, onPageChange, bookId, initialLoadComplete]);
+
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     console.log("PDF loaded successfully with", numPages, "pages");
     setNumPages(numPages);
     setErrorMessage(null);
+
+    if (onDocumentLoaded) {
+      onDocumentLoaded(numPages);
+    }
+
+    // Now that we have total pages, calculate completion
+    if (pageNumber && onPageChange) {
+      const completionPercentage = Math.round((pageNumber / numPages) * 100);
+      onPageChange(pageNumber, completionPercentage);
+    }
   }
+
+  useEffect(() => {
+    if (onPageChange && pageNumber) {
+      onPageChange(pageNumber);
+    }
+  }, [pageNumber, onPageChange]);
 
   function onDocumentLoadError(error: Error): void {
     console.error("Error loading PDF:", error);

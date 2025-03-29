@@ -5,14 +5,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Search, Menu, X, User, BookOpen } from "lucide-react";
 import NavbarMobile from "./NavbarMobile";
+import useLogout from "@/stores/auth/logout";
+import handleLogout from "@/app/auth/logout/logout";
 
 const Navbar = () => {
+  const [loadLogout, setLoadLogout] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  // store
+  const { setLogout } = useLogout();
+  // router
+  const router = useRouter();
 
   // Initial reader settings
   const [readerSettings, setReaderSettings] = useState({
@@ -134,9 +141,20 @@ const Navbar = () => {
             <li>
               <Link href="/pengaturan">Pengaturan</Link>
             </li>
-            <li>
-              <Link href="/logout">Keluar</Link>
-            </li>
+            {loadLogout ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              <li>
+                <Link
+                  href="#"
+                  onClick={() =>
+                    handleLogout({ setLogout, setLoadLogout, router })
+                  }
+                >
+                  Keluar
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -145,6 +163,10 @@ const Navbar = () => {
       <NavbarMobile
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
+        setLogout={setLogout}
+        router={router}
+        setLoadLogout={setLoadLogout}
+        loadLogout={loadLogout}
       />
     </div>
   );

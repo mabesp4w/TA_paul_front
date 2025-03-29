@@ -2,6 +2,7 @@
 
 "use client";
 
+import handleLogout from "@/app/auth/logout/logout";
 import {
   Bookmark,
   BookmarkIcon,
@@ -20,8 +21,19 @@ import React from "react";
 type Props = {
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setLogout: () => Promise<{ status: string; data?: any; error?: any }>;
+  router: any;
+  setLoadLogout: React.Dispatch<React.SetStateAction<boolean>>;
+  loadLogout: boolean;
 };
-const NavbarMobile = ({ isMobileMenuOpen, setIsMobileMenuOpen }: Props) => {
+const NavbarMobile = ({
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+  setLogout,
+  router,
+  setLoadLogout,
+  loadLogout,
+}: Props) => {
   // pathname
   const pathname = usePathname();
   return (
@@ -142,11 +154,23 @@ const NavbarMobile = ({ isMobileMenuOpen, setIsMobileMenuOpen }: Props) => {
                   <Settings size={20} /> Pengaturan
                 </Link>
               </li>
-              <li>
-                <Link href="/logout" onClick={() => setIsMobileMenuOpen(false)}>
-                  <LogOut size={20} /> Keluar
-                </Link>
-              </li>
+              {loadLogout ? (
+                <li>
+                  <span className="loading loading-spinner text-primary"></span>
+                </li>
+              ) : (
+                <li>
+                  <Link
+                    href="/logout"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout({ setLogout, setLoadLogout, router });
+                    }}
+                  >
+                    <LogOut size={20} /> Keluar
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>
