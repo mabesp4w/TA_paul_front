@@ -26,6 +26,8 @@ type Store = {
     data: CategoryType[];
   };
 
+  showCategory: CategoryType | null;
+
   setCategory: ({ page, limit, search, sortby, order }: Props) => Promise<{
     status: string;
     data?: {};
@@ -59,6 +61,7 @@ const useCategory = create(
       current_page: 0,
       data: [],
     },
+    showCategory: null,
     setCategory: async ({ page = 1, limit = 10, search, sortby, order }) => {
       const token = await useLogin.getState().setToken();
       try {
@@ -99,7 +102,7 @@ const useCategory = create(
         });
         set((state) => ({
           ...state,
-          dtCategory: response.data.data,
+          showCategory: response.data.data,
         }));
         return {
           status: "berhasil",

@@ -95,7 +95,7 @@ export default function HomePage() {
                 <div className="card-body p-4">
                   <h3 className="card-title">{category.category_nm}</h3>
                   <p className="text-sm opacity-70">
-                    {category.read_count} Buku
+                    {category.book_count} Buku
                   </p>
                 </div>
               </Link>

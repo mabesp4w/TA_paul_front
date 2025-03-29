@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import Cookies from "js-cookie";
 
 type Props = {
   isMobileMenuOpen: boolean;
@@ -36,6 +37,7 @@ const NavbarMobile = ({
 }: Props) => {
   // pathname
   const pathname = usePathname();
+  const user = JSON.parse(Cookies.get("user") || "{}");
   return (
     <div>
       {isMobileMenuOpen && (
@@ -58,7 +60,7 @@ const NavbarMobile = ({
                   </div>
                 </div>
               </div>
-              <h2 className="text-xl font-bold">Nama Pengguna</h2>
+              <h2 className="text-xl font-bold">{user.first_name}</h2>
             </div>
 
             <div className="divider my-4"></div>

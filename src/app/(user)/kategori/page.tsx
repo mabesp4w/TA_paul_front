@@ -1,27 +1,23 @@
 /** @format */
-
+"use client";
 // src/app/kategori/page.tsx
 import Link from "next/link";
 import { Book, ChevronRight } from "lucide-react";
 import UserSidebar from "@/components/sidebar/UserSidebar";
-
-// Contoh data kategori
-const allCategories = [
-  { id: "1", category_nm: "Pengembangan Diri", bookCount: 24 },
-  { id: "2", category_nm: "Psikologi", bookCount: 18 },
-  { id: "3", category_nm: "Bisnis", bookCount: 32 },
-  { id: "4", category_nm: "Teknologi", bookCount: 15 },
-  { id: "5", category_nm: "Sejarah", bookCount: 21 },
-  { id: "6", category_nm: "Filsafat", bookCount: 12 },
-  { id: "7", category_nm: "Sains", bookCount: 19 },
-  { id: "8", category_nm: "Fiksi", bookCount: 28 },
-  { id: "9", category_nm: "Kesehatan", bookCount: 14 },
-  { id: "10", category_nm: "Pendidikan", bookCount: 16 },
-  { id: "11", category_nm: "Politik", bookCount: 9 },
-  { id: "12", category_nm: "Seni", bookCount: 11 },
-];
+import useCategoryApi from "@/stores/api/Category";
+import { useCallback, useEffect } from "react";
 
 export default function CategoriesPage() {
+  const { setCategory, dtCategory } = useCategoryApi();
+
+  // get set book
+  const getData = useCallback(async () => {
+    await setCategory();
+  }, [setCategory]);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
   return (
     <div className="flex">
       <UserSidebar />
@@ -31,7 +27,7 @@ export default function CategoriesPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {allCategories.map((category) => (
+          {dtCategory.map((category) => (
             <Link
               key={category.id}
               href={`/kategori/${category.id}`}
@@ -41,7 +37,7 @@ export default function CategoriesPage() {
                 <h3 className="card-title">{category.category_nm}</h3>
                 <div className="flex items-center gap-1 text-sm opacity-70">
                   <Book size={16} />
-                  <span>{category.bookCount} buku</span>
+                  <span>{category.book_count} buku</span>
                 </div>
                 <div className="card-actions justify-end mt-2">
                   <ChevronRight size={16} className="text-primary" />

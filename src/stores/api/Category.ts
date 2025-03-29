@@ -72,7 +72,7 @@ const useCategoryApi = create(
         });
         set((state) => ({
           ...state,
-          showCategory: response.data.data,
+          showCategory: response.data,
         }));
         return {
           status: "berhasil",
@@ -94,7 +94,7 @@ const useCategoryApi = create(
         });
         set((state) => ({
           ...state,
-          dtCategory: response.data,
+          popularCategory: response.data,
         }));
         return {
           status: "berhasil",

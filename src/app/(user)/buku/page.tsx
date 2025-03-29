@@ -10,6 +10,7 @@ import BookGrid from "@/components/book/BookGrid";
 import UserSidebar from "@/components/sidebar/UserSidebar";
 import useBook from "@/stores/crud/Book";
 import PaginationDef from "@/components/pagination/PaginationDef";
+import useCategoryApi from "@/stores/api/Category";
 
 // Contoh data untuk UI
 
@@ -19,8 +20,9 @@ export default function BooksPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [yearRange, setYearRange] = useState<[number, number]>([1900, 2025]);
   const [page, setPage] = useState(1);
-
+  // store
   const { setBook, dtBook } = useBook();
+  const { setCategory, dtCategory } = useCategoryApi();
 
   // get set book
   const getData = useCallback(async () => {
@@ -30,7 +32,8 @@ export default function BooksPage() {
       sortby: "",
       order: "",
     });
-  }, [page, searchQuery, setBook]);
+    await setCategory();
+  }, [page, searchQuery, setBook, setCategory]);
 
   useEffect(() => {
     getData();
@@ -85,34 +88,29 @@ export default function BooksPage() {
                 <span className="label-text font-medium">Kategori</span>
               </label>
               <div className="flex flex-col gap-2">
-                {[
-                  "Pengembangan Diri",
-                  "Psikologi",
-                  "Bisnis",
-                  "Teknologi",
-                  "Sejarah",
-                  "Filsafat",
-                ].map((category) => (
-                  <div key={category} className="form-control">
+                {dtCategory.map((category) => (
+                  <div key={category.id} className="form-control">
                     <label className="label cursor-pointer justify-start gap-2">
                       <input
                         type="checkbox"
                         className="checkbox checkbox-sm"
-                        checked={selectedCategories.includes(category)}
+                        checked={selectedCategories.includes(category.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
                             setSelectedCategories([
                               ...selectedCategories,
-                              category,
+                              category.id,
                             ]);
                           } else {
                             setSelectedCategories(
-                              selectedCategories.filter((c) => c !== category)
+                              selectedCategories.filter(
+                                (c) => c !== category.id
+                              )
                             );
                           }
                         }}
                       />
-                      <span className="label-text">{category}</span>
+                      <span className="label-text">{category.category_nm}</span>
                     </label>
                   </div>
                 ))}

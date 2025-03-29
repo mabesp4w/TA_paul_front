@@ -7,7 +7,6 @@ import {
   Home,
   BookOpen,
   Bookmark,
-  BookmarkCheck,
   Layers,
   ChevronLeft,
   ChevronRight,
@@ -45,20 +44,15 @@ const UserSidebar = () => {
 
   const menuItems = [
     { icon: <Home size={20} />, label: "Beranda", path: "/dashboard" },
-    { icon: <BookOpen size={20} />, label: "Semua Buku", path: "/buku" },
+    { icon: <BookOpen size={20} />, label: "Buku", path: "/buku" },
     {
       icon: <BookOpen size={20} />,
-      label: "Sedang Dibaca",
+      label: "Dibaca",
       path: "/sedang-dibaca",
     },
     {
-      icon: <BookmarkCheck size={20} />,
-      label: "Selesai Dibaca",
-      path: "/selesai-dibaca",
-    },
-    {
       icon: <Layers size={20} />,
-      label: "Koleksi Saya",
+      label: "Koleksi",
       path: "/koleksi-saya",
     },
     { icon: <Bookmark size={20} />, label: "Bookmark", path: "/bookmark" },
@@ -91,7 +85,7 @@ const UserSidebar = () => {
               className={pathname === item.path ? "active" : ""}
             >
               {item.icon}
-              <span className="btm-nav-label">{item.label}</span>
+              <span className="btm-nav-label text-sm">{item.label}</span>
             </Link>
           ))}
         </div>
