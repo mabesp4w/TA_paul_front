@@ -1,12 +1,14 @@
 /** @format */
 
-import React from "react";
+import React, { Suspense } from "react";
 import Content from "./Content";
 
 const BookViews = () => {
   return (
     <section className="flex flex-col h-full">
-      <Content />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Content />
+      </Suspense>
     </section>
   );
 };

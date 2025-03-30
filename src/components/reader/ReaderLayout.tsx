@@ -5,22 +5,9 @@
 
 import { ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Menu,
-  Bookmark,
-  Highlighter,
-  Search,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  List,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Search, Settings } from "lucide-react";
 import BookmarkButton from "./BookmarkButton";
 import HighlightButton from "./HighlightButton";
-import BookmarkList from "./BookmarkList";
-import AnnotationList from "./AnnotationList";
 import ReaderSettings from "./ReaderSettings";
 
 interface ReaderLayoutProps {
@@ -42,13 +29,14 @@ const ReaderLayout = ({
   currentLocation = "",
   selectedText = "",
   onBookmarkSelect = () => {},
-  onAnnotationSelect = () => {},
   onSettingsChange = () => {},
   fileType,
 }: ReaderLayoutProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const drawerCheckboxRef = useRef<HTMLInputElement>(null);
+
+  console.log({ isMobile, onBookmarkSelect });
 
   // Initial reader settings
   const [readerSettings, setReaderSettings] = useState({
