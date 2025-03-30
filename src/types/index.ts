@@ -52,13 +52,13 @@ export interface Category {
 // Collection Types
 export interface Collection {
   id: string;
-  name: string;
+  collection_nm: string;
   description?: string;
-  bookCount: number;
+  book_count: number;
   lastUpdated: string;
-  coverImages?: string[];
+  book_detail: Book[];
   createdAt: string;
-  userId: string;
+  user: User;
 }
 
 // ReadingProgress Types

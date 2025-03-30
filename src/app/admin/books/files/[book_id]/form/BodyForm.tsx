@@ -19,7 +19,7 @@ const BodyForm: FC<Props> = ({ register, errors, setValue, watch, dtEdit }) => {
   return (
     <>
       <InputFile
-        label={`File Buku`}
+        label={`Max 10MB`}
         name="file_book"
         register={register}
         addClass="col-span-8"

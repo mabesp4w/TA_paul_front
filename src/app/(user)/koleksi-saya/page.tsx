@@ -3,106 +3,32 @@
 // src/app/koleksi-saya/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, FolderOpen, Book, Trash2, Edit } from "lucide-react";
 import UserSidebar from "@/components/sidebar/UserSidebar";
-
-// Contoh data koleksi
-const userCollections = [
-  {
-    id: "1",
-    collection_nm: "Favorit",
-    description: "Buku-buku favorit saya",
-    bookCount: 8,
-    books: [
-      {
-        id: "1",
-        title: "Filosofi Teras",
-        author: "Henry Manampiring",
-        coverImage: "/images/filosofi-teras.jpg",
-        year: "2019",
-      },
-      {
-        id: "2",
-        title: "Atomic Habits",
-        author: "James Clear",
-        coverImage: "/images/atomic-habits.jpg",
-        year: "2018",
-      },
-      {
-        id: "3",
-        title: "Sapiens",
-        author: "Yuval Noah Harari",
-        coverImage: "/images/sapiens.jpg",
-        year: "2015",
-      },
-      {
-        id: "4",
-        title: "Mindset",
-        author: "Carol S. Dweck",
-        coverImage: "/images/mindset.jpg",
-        year: "2006",
-      },
-    ],
-  },
-  {
-    id: "2",
-    collection_nm: "Self Improvement",
-    description: "Buku-buku pengembangan diri",
-    bookCount: 12,
-    books: [
-      {
-        id: "2",
-        title: "Atomic Habits",
-        author: "James Clear",
-        coverImage: "/images/atomic-habits.jpg",
-        year: "2018",
-      },
-      {
-        id: "7",
-        title: "Thinking, Fast and Slow",
-        author: "Daniel Kahneman",
-        coverImage: "/images/thinking.jpg",
-        year: "2011",
-      },
-      {
-        id: "9",
-        title: "The Power of Habit",
-        author: "Charles Duhigg",
-        coverImage: "/images/power-habit.jpg",
-        year: "2012",
-      },
-    ],
-  },
-  {
-    id: "3",
-    collection_nm: "Filsafat",
-    description: "Buku-buku filsafat",
-    bookCount: 5,
-    books: [
-      {
-        id: "1",
-        title: "Filosofi Teras",
-        author: "Henry Manampiring",
-        coverImage: "/images/filosofi-teras.jpg",
-        year: "2019",
-      },
-      {
-        id: "10",
-        title: "Man's Search for Meaning",
-        author: "Viktor E. Frankl",
-        coverImage: "/images/mans-search.jpg",
-        year: "1946",
-      },
-    ],
-  },
-];
+import useCollections from "@/stores/crud/Collections";
+import Cookies from "js-cookie";
+import Image from "next/image";
 
 export default function CollectionsPage() {
+  // cookies
+  const user = JSON.parse(Cookies.get("user") || "{}");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
+  // store
+  const { setCollection, dtCollection } = useCollections();
+  useEffect(() => {
+    if (user?.id) {
+      setCollection({
+        user: user.id,
+        per_page: 100,
+      });
+    }
+  }, [setCollection, user.id]);
+
+  console.log({ dtCollection });
 
   return (
     <div className="flex">
@@ -118,9 +44,9 @@ export default function CollectionsPage() {
           </button>
         </div>
 
-        {userCollections.length > 0 ? (
+        {dtCollection?.data.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userCollections.map((collection) => (
+            {dtCollection.data.map((collection) => (
               <div
                 key={collection.id}
                 className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
@@ -175,22 +101,24 @@ export default function CollectionsPage() {
 
                   <div className="mt-2 flex items-center gap-1 text-sm">
                     <Book size={16} />
-                    <span>{collection.bookCount} buku</span>
+                    <span>{collection.book_count} buku</span>
                   </div>
 
                   {/* Preview Buku */}
                   <div className="flex mt-2 mb-4 h-24 overflow-hidden">
-                    {collection.books.slice(0, 4).map((book, index) => (
+                    {collection.book_detail.slice(0, 4).map((book, index) => (
                       <div
                         key={book.id}
                         className="relative h-full w-16 mr-1 overflow-hidden rounded-md"
                         style={{ right: index * 3 + "px" }}
                       >
-                        {book.coverImage ? (
-                          <img
-                            src={book.coverImage}
+                        {book.cover_image ? (
+                          <Image
+                            src={book.cover_image}
                             alt={book.title}
                             className="h-full w-full object-cover"
+                            width={100}
+                            height={100}
                           />
                         ) : (
                           <div className="h-full w-full bg-base-300 flex items-center justify-center">
@@ -200,10 +128,10 @@ export default function CollectionsPage() {
                       </div>
                     ))}
 
-                    {collection.bookCount > 4 && (
+                    {collection.book_count > 4 && (
                       <div className="flex items-center justify-center h-full w-16 rounded-md bg-base-200">
                         <span className="text-sm font-medium">
-                          +{collection.bookCount - 4}
+                          +{collection.book_count - 4}
                         </span>
                       </div>
                     )}

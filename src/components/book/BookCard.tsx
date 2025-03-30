@@ -3,7 +3,7 @@
 // src/components/book/BookCard.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Heart } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface BookCardProps {
   id: string;
@@ -40,9 +40,6 @@ const BookCard = ({ id, title, author, coverImage, year }: BookCardProps) => {
         <p className="text-sm opacity-70">{author}</p>
         <p className="text-xs opacity-60">{year}</p>
         <div className="card-actions justify-end mt-2">
-          <button className="btn btn-ghost btn-sm btn-circle">
-            <Heart size={16} />
-          </button>
           <Link href={`/buku/${id}`} className="btn btn-primary btn-sm">
             Baca
           </Link>

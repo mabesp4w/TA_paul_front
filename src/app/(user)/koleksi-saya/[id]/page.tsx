@@ -3,94 +3,47 @@
 // src/app/koleksi-saya/[id]/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { FolderOpen, Edit, Trash2, Plus, Search, Book } from "lucide-react";
-import BookGrid from "@/components/book/BookGrid";
+import { FolderOpen, Plus, Search, Book } from "lucide-react";
 import UserSidebar from "@/components/sidebar/UserSidebar";
+import useCollections from "@/stores/crud/Collections";
+import { Book as BookType } from "@/types";
+import Image from "next/image";
+import BookCard from "@/components/book/BookCard";
 
 export default function CollectionDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
+  const [filteredBooks, setFilteredBooks] = useState<BookType[]>([]);
 
-  // Contoh data koleksi (dalam implementasi nyata, ini akan diambil dari API)
-  const collection = {
-    id,
-    collection_nm: "Favorit",
-    description: "Buku-buku favorit pilihan saya untuk dibaca kapan saja.",
-    books: [
-      {
-        id: "1",
-        title: "Filosofi Teras",
-        author: "Henry Manampiring",
-        coverImage: "/images/filosofi-teras.jpg",
-        year: "2019",
-      },
-      {
-        id: "2",
-        title: "Atomic Habits",
-        author: "James Clear",
-        coverImage: "/images/atomic-habits.jpg",
-        year: "2018",
-      },
-      {
-        id: "3",
-        title: "Sapiens",
-        author: "Yuval Noah Harari",
-        coverImage: "/images/sapiens.jpg",
-        year: "2015",
-      },
-      {
-        id: "4",
-        title: "Mindset",
-        author: "Carol S. Dweck",
-        coverImage: "/images/mindset.jpg",
-        year: "2006",
-      },
-    ],
-  };
+  // store
+  const {
+    setShowCollection,
+    showCollection,
+    setAvailableBooks,
+    dtAvailableBooks,
+  } = useCollections();
 
-  // Contoh buku untuk ditambahkan ke koleksi
-  const availableBooks = [
-    {
-      id: "5",
-      title: "Deep Work",
-      author: "Cal Newport",
-      coverImage: "/images/deep-work.jpg",
-      year: "2016",
-    },
-    {
-      id: "6",
-      title: "Educated",
-      author: "Tara Westover",
-      coverImage: "/images/educated.jpg",
-      year: "2018",
-    },
-    {
-      id: "7",
-      title: "Thinking, Fast and Slow",
-      author: "Daniel Kahneman",
-      coverImage: "/images/thinking.jpg",
-      year: "2011",
-    },
-    {
-      id: "8",
-      title: "Outliers",
-      author: "Malcolm Gladwell",
-      coverImage: "/images/outliers.jpg",
-      year: "2008",
-    },
-  ];
+  useEffect(() => {
+    setShowCollection(id);
+    setAvailableBooks(id);
+  }, [id, setAvailableBooks, setShowCollection]);
 
   // Filter buku berdasarkan pencarian
-  const filteredBooks = collection.books.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    if (showCollection) {
+      const filtered = showCollection?.book_detail?.filter(
+        (book: BookType) =>
+          book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          book.author.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredBooks(filtered);
+    }
+  }, [searchQuery, showCollection]);
 
   return (
     <div className="flex">
@@ -105,7 +58,7 @@ export default function CollectionDetailPage() {
               <li>
                 <Link href="/koleksi-saya">Koleksi Saya</Link>
               </li>
-              <li>{collection.collection_nm}</li>
+              <li>{showCollection?.collection_nm}</li>
             </ul>
           </div>
         </div>
@@ -115,21 +68,15 @@ export default function CollectionDetailPage() {
             <div className="flex items-center gap-2">
               <FolderOpen size={24} className="text-primary" />
               <h1 className="text-2xl md:text-3xl font-bold">
-                {collection.collection_nm}
+                {showCollection?.collection_nm}
               </h1>
             </div>
             <p className="mt-2 text-gray-600 max-w-2xl">
-              {collection.description}
+              {showCollection?.description}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2 self-start">
-            <button className="btn btn-outline btn-sm gap-1">
-              <Edit size={16} /> Edit
-            </button>
-            <button className="btn btn-error btn-outline btn-sm gap-1">
-              <Trash2 size={16} /> Hapus
-            </button>
             <button
               className="btn btn-primary btn-sm gap-1"
               onClick={() => setIsAddBookModalOpen(true)}
@@ -154,27 +101,19 @@ export default function CollectionDetailPage() {
           </div>
         </div>
 
-        <BookGrid
-          books={filteredBooks}
-          emptyMessage="Tidak ada buku dalam koleksi ini."
-          header={
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                Daftar Buku ({collection.books.length})
-              </h2>
-              <div className="flex gap-2 items-center">
-                <span className="text-sm">Urutkan:</span>
-                <select className="select select-bordered select-sm">
-                  <option value="title_asc">Judul (A-Z)</option>
-                  <option value="title_desc">Judul (Z-A)</option>
-                  <option value="author">Penulis</option>
-                  <option value="year_desc">Tahun (Terbaru)</option>
-                  <option value="year_asc">Tahun (Terlama)</option>
-                </select>
-              </div>
-            </div>
-          }
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {filteredBooks.length > 0 &&
+            filteredBooks.map((book: BookType) => (
+              <BookCard
+                key={book.id}
+                id={book.id}
+                title={book.title}
+                author={book.author}
+                coverImage={book.cover_image as string}
+                year={book.year as string}
+              />
+            ))}
+        </div>
 
         {/* Modal Tambah Buku ke Koleksi */}
         <dialog
@@ -200,35 +139,38 @@ export default function CollectionDetailPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto p-1">
-              {availableBooks.map((book) => (
-                <div
-                  key={book.id}
-                  className="card card-compact card-side bg-base-100 shadow"
-                >
-                  <figure className="w-20 h-auto bg-base-200">
-                    {book.coverImage ? (
-                      <img
-                        src={book.coverImage}
-                        alt={book.title}
-                        className="h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full">
-                        <Book size={20} className="opacity-30" />
+              {dtAvailableBooks &&
+                dtAvailableBooks.map((book) => (
+                  <div
+                    key={book.id}
+                    className="card card-compact card-side bg-base-100 shadow"
+                  >
+                    <figure className="w-20 h-auto bg-base-200">
+                      {book.cover_image ? (
+                        <Image
+                          src={book.cover_image}
+                          alt={book.title}
+                          className="h-full object-cover"
+                          width={100}
+                          height={150}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full">
+                          <Book size={20} className="opacity-30" />
+                        </div>
+                      )}
+                    </figure>
+                    <div className="card-body">
+                      <h2 className="card-title text-sm">{book.title}</h2>
+                      <p className="text-xs opacity-70">{book.author}</p>
+                      <div className="card-actions justify-end">
+                        <button className="btn btn-primary btn-xs">
+                          Tambahkan
+                        </button>
                       </div>
-                    )}
-                  </figure>
-                  <div className="card-body">
-                    <h2 className="card-title text-sm">{book.title}</h2>
-                    <p className="text-xs opacity-70">{book.author}</p>
-                    <div className="card-actions justify-end">
-                      <button className="btn btn-primary btn-xs">
-                        Tambahkan
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             <div className="modal-action">
