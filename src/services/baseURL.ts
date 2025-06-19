@@ -6,7 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const url_auth = `${BASE_URL}/auth`;
 const url_api = `${BASE_URL}/api`;
 const url_crud = `${BASE_URL}/crud`;
-const url_storage = `${BASE_URL}/storage`;
+const url_storage = `${BASE_URL}/media/`;
 
 const auth = axios.create({
   baseURL: url_auth,

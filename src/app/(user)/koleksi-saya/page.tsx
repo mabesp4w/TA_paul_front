@@ -10,6 +10,7 @@ import UserSidebar from "@/components/sidebar/UserSidebar";
 import useCollections from "@/stores/crud/Collections";
 import Cookies from "js-cookie";
 import Image from "next/image";
+import { url_storage } from "@/services/baseURL";
 
 export default function CollectionsPage() {
   // cookies
@@ -114,7 +115,7 @@ export default function CollectionsPage() {
                       >
                         {book.cover_image ? (
                           <Image
-                            src={book.cover_image}
+                            src={url_storage + book.cover_image}
                             alt={book.title}
                             className="h-full w-full object-cover"
                             width={100}

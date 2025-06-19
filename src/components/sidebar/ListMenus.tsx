@@ -1,7 +1,7 @@
 /** @format */
 
 import MenuType from "@/types/MenuType";
-import { BsBook, BsHouseDoor, BsInfoLg } from "react-icons/bs";
+import { BsBook, BsHouseDoor, BsInfoLg, BsPerson } from "react-icons/bs";
 
 const adminUrl = (path: string) => `/admin${path}`;
 const userUrl = (path: string) => `${path}`;
@@ -22,6 +22,11 @@ const setAdminMenus = () => {
       name: "Buku",
       href: adminUrl("/books/lists"),
       icon: <BsBook />,
+    },
+    {
+      name: "Pengguna",
+      href: adminUrl("/users"),
+      icon: <BsPerson />,
     },
   ];
 

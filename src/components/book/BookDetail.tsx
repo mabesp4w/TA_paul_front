@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Book, Heart, Share, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
+import { url_storage } from "@/services/baseURL";
 
 interface BookDetailProps {
   id: string;
@@ -50,7 +51,7 @@ const BookDetail = ({
       <figure className="lg:w-1/3 h-80 lg:h-auto relative bg-base-200">
         {cover_image ? (
           <Image
-            src={cover_image}
+            src={url_storage + cover_image}
             alt={title}
             layout="fill"
             objectFit="cover"

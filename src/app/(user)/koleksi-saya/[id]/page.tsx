@@ -12,6 +12,7 @@ import useCollections from "@/stores/crud/Collections";
 import { Book as BookType } from "@/types";
 import Image from "next/image";
 import BookCard from "@/components/book/BookCard";
+import { url_storage } from "@/services/baseURL";
 
 export default function CollectionDetailPage() {
   const params = useParams();
@@ -109,7 +110,7 @@ export default function CollectionDetailPage() {
                 id={book.id}
                 title={book.title}
                 author={book.author}
-                coverImage={book.cover_image as string}
+                coverImage={(url_storage + book.cover_image) as string}
                 year={book.year as string}
               />
             ))}
@@ -148,7 +149,7 @@ export default function CollectionDetailPage() {
                     <figure className="w-20 h-auto bg-base-200">
                       {book.cover_image ? (
                         <Image
-                          src={book.cover_image}
+                          src={url_storage + book.cover_image}
                           alt={book.title}
                           className="h-full object-cover"
                           width={100}

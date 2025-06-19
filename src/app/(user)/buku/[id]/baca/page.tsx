@@ -12,6 +12,7 @@ import useBook from "@/stores/crud/Book";
 import { BookFileType } from "@/types/BookFileType";
 import useReadingProgress from "@/stores/crud/ReadingProgress";
 import Cookies from "js-cookie";
+import { url_storage } from "@/services/baseURL";
 
 export default function BookReaderPage() {
   const params = useParams();
@@ -32,6 +33,8 @@ export default function BookReaderPage() {
   const { setReadingProgress, addData, updateData } = useReadingProgress();
 
   console.log({ numPages });
+
+  console.log({ showDtBook });
 
   // effect
   useEffect(() => {
@@ -208,7 +211,7 @@ export default function BookReaderPage() {
         {format === "PDF" ? (
           <PdfReader
             bookId={showDtBook.id}
-            file_book={file.file_book}
+            file_book={url_storage + file.file_book}
             onPageChange={(page, completionPercentage) => {
               const pageStr = page.toString();
               setCurrentLocation(pageStr);
@@ -224,7 +227,7 @@ export default function BookReaderPage() {
         ) : (
           <EpubReader
             bookId={showDtBook.id}
-            file_book={file.file_book}
+            file_book={url_storage + file.file_book}
             onTextSelection={handleTextSelection}
             onLocationChange={handleLocationChange}
           />

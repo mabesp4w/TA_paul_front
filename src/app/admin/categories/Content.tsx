@@ -62,10 +62,7 @@ const Content = () => {
         <Form dtEdit={dtEdit} halaman={halaman} />
         <DeleteModal setDelete={setDelete} />
         <div className="mb-4 flex justify-between">
-          <p>
-            Silahkan Mengolah data {halaman}. Salin link dari youtube untuk
-            menambahkan category.
-          </p>
+          <p>Silahkan Mengolah data {halaman}</p>
 
           <button className="btn btn-primary" onClick={handleTambah}>
             Tambah Data

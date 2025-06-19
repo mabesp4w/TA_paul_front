@@ -10,6 +10,7 @@ import UserSidebar from "@/components/sidebar/UserSidebar";
 import useReadingProgress from "@/stores/crud/ReadingProgress";
 import { ReadingProgress } from "@/types";
 import Image from "next/image";
+import { url_storage } from "@/services/baseURL";
 
 export default function InProgressPage() {
   // state
@@ -95,7 +96,9 @@ export default function InProgressPage() {
                       <div className="w-1/3 h-48 bg-base-200">
                         {progress.book_detail?.cover_image ? (
                           <Image
-                            src={progress.book_detail?.cover_image}
+                            src={
+                              url_storage + progress.book_detail?.cover_image
+                            }
                             alt={progress.book_detail?.title}
                             className="h-full w-full object-cover rounded-l-lg"
                             width={100}

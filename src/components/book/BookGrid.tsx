@@ -4,6 +4,7 @@
 import { ReactNode } from "react";
 import BookCard from "./BookCard";
 import { BookType } from "@/types/BookType";
+import { url_storage } from "@/services/baseURL";
 
 interface BookGridProps {
   books: BookType[];
@@ -31,7 +32,7 @@ const BookGrid = ({
               id={book.id}
               title={book.title}
               author={book.author}
-              coverImage={book.cover_image}
+              coverImage={url_storage + book.cover_image}
               year={book.year as string}
             />
           ))}

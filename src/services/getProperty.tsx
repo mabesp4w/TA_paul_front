@@ -4,6 +4,7 @@ import Image from "next/image";
 import moment from "moment";
 import DOMPurify from "dompurify";
 import Link from "next/link";
+import { url_storage } from "./baseURL";
 
 const getYouTubeVideoId = (url: string) => {
   const regExp =
@@ -80,7 +81,7 @@ const getProperty = (obj: any, prop: any, index: number, setIndexBox: any) => {
         currentObj &&
         (["png", "jpg", "jpeg"].includes(extension) ? (
           <Image
-            src={`${currentObj}`}
+            src={`${url_storage + currentObj}`}
             loading="lazy"
             width={70}
             height={70}
@@ -102,7 +103,7 @@ const getProperty = (obj: any, prop: any, index: number, setIndexBox: any) => {
           </Link>
         ) : (
           <a
-            href={`${currentObj}`}
+            href={`${url_storage + currentObj}`}
             target="_blank"
             rel="noreferrer"
             className="text-blue-700"
