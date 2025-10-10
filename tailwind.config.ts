@@ -20,6 +20,7 @@ const config: Config = {
         cabin: ["Cabin", "sans-serif"],
         "comic-neue": ["Comic Neue", "sans-serif"],
         arvo: ["Arvo", "serif"],
+        "times-new-roman": ["Times New Roman", "Times", "serif"],
       },
     },
   },

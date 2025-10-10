@@ -24,7 +24,7 @@ export default function HomePage() {
   return (
     <div className="flex">
       <UserSidebar />
-      <div className="flex-1 p-4 md:p-6">
+      <div className="flex-1 p-4 md:p-6 font-times-new-roman">
         {/* Hero Section */}
         <section className="hero bg-base-200 rounded-box mb-8">
           <div className="hero-content flex-col lg:flex-row py-8">

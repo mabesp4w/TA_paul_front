@@ -116,6 +116,39 @@
   src: url("/fonts/Comic-Neue/ComicNeue-LightItalic.ttf") format("truetype");
 }
 
+/* Times New Roman - using system font stack */
+@font-face {
+  font-family: "Times New Roman";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Times New Roman"), local("TimesNewRoman"), local("Times"), local("serif");
+}
+
+@font-face {
+  font-family: "Times New Roman";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Times New Roman Italic"), local("TimesNewRomanItalic"), local("Times-Italic"), local("serif");
+}
+
+@font-face {
+  font-family: "Times New Roman";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Times New Roman Bold"), local("TimesNewRomanBold"), local("Times-Bold"), local("serif");
+}
+
+@font-face {
+  font-family: "Times New Roman";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Times New Roman Bold Italic"), local("TimesNewRomanBoldItalic"), local("Times-BoldItalic"), local("serif");
+}
+
 .epubjs-hl {
   fill-opacity: 0.3;
   mix-blend-mode: multiply;
